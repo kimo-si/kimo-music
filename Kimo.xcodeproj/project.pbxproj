@@ -1,0 +1,650 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		038F0318D2C251202E84F6C3 /* SkinPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF5A6AEDA684AD3CA9BDB12 /* SkinPicker.swift */; };
+		1068273071AB9619D69D3C8D /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = F0D4564DB5B017E927F2E479 /* logo.png */; };
+		1840282C84533F571243F1D3 /* MusicCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = A328A0C203E1A72C39B9E5DE /* MusicCards.swift */; };
+		19F1149F1EAE6C8C73119983 /* VinylRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B696519D84EF3091E0D04955 /* VinylRecord.swift */; };
+		1F106B8AB29D75D5F4916E8F /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */; };
+		27D7BA22710EF59019AF8A98 /* LikedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F3F0BC52D7EAEC050ABB72 /* LikedView.swift */; };
+		2C821758D8904266D4D5A320 /* Skins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F97B65281B031F2AE16DD6 /* Skins.swift */; };
+		31C9E8FF0633E51C722892CF /* wordmark.png in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1A78AADBE5528D3838AF3 /* wordmark.png */; };
+		330723659D64B35EF06FD404 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544097DC68306F1C78DFD7D4 /* AppModel.swift */; };
+		35CA8E9CA828691D1493A6AE /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5C345924B21EF798CC077DF /* AppKit.framework */; };
+		433C72C633917D326C346FD0 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224ABEDFC6D6F0A7F4BCDBF1 /* AppSettings.swift */; };
+		4CFC1C1DCB6A416610E42888 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB957CAD1F3D447E09CC9D3 /* Components.swift */; };
+		4F6B9ADC601F01E9CEE6ED8B /* DetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698D74D42B513F20F0D5AA80 /* DetailViews.swift */; };
+		4F6F7B081A962802B6077095 /* KimoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E830A541F95A4F62F7C83ED /* KimoApp.swift */; };
+		54D767174E81A407E57F5472 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1939C69381522C2E74348442 /* SidebarView.swift */; };
+		592E55B0D3CA7734D0408305 /* LocalLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB257004AD9954B430CA85AC /* LocalLibrary.swift */; };
+		5C933EC205893FAEF6265C6F /* Accent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE95C1FCDA5E29C4902DB977 /* Accent.swift */; };
+		5E80B0147180CB3CDFDBBD5D /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A6A88E6672A5CC9B6A4F1 /* AuthStore.swift */; };
+		603539F54B87163E8333F99C /* MusicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1194D9AD0BDB19AB944AB7A /* MusicAPI.swift */; };
+		6AF04E0DE607E577D3817341 /* Dbg.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9657C149424E116F80BD12B /* Dbg.swift */; };
+		6B306CF029530C1F46C4C6C3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D777BB2437D688B808DA6AD0 /* HomeView.swift */; };
+		71269D8857BEF360CE4D628E /* ArtistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FE20107D8FA5CF3A38C1EC /* ArtistsView.swift */; };
+		7679008123B50F10FB9CC7EF /* ShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADFEE39C7E8224EC0AEEDB7 /* ShellView.swift */; };
+		7F59F5FE73A0ABBD7BED503E /* LyricsDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9119EE5066E77EC5A2E5655 /* LyricsDrawer.swift */; };
+		8A92B9349B5520290AC68821 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD7092C3DF4D7C6D9207F48 /* SettingsView.swift */; };
+		913D078EF23A779D840AE7AE /* SkinChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2919D248D15AF0ECA98DD18A /* SkinChrome.swift */; };
+		933102D41036FB18E7064B89 /* LocalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D45056C0FFB73274E36452D /* LocalView.swift */; };
+		974DC932C16A2D115035E6F4 /* chiikawa-trio.png in Resources */ = {isa = PBXBuildFile; fileRef = 1D6ED57779D404B0CA29EEA1 /* chiikawa-trio.png */; };
+		A1DCAD7AD6207FACD745759F /* RecentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA6F78C9CBADE862096844 /* RecentView.swift */; };
+		AAAA06EEB870A46A068BBDA1 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A30C0FC93154846122F6816 /* Tokens.swift */; };
+		B94FBB52E7E6A904DD1E4FAA /* LoginDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64847E85E86F34E7F9DB2E94 /* LoginDialog.swift */; };
+		BBB9B0C36DD993E4C235E043 /* LikeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1154428BC35C5F65A0A967E /* LikeStore.swift */; };
+		C297FE63E805513156085C1A /* MiniPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5D2830A93F2638FA0DF6CF /* MiniPlayer.swift */; };
+		C8450F49D1CF42301A14E447 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24E6804A8839F152A1D9607 /* Models.swift */; };
+		CD0082F311F2601A0666FD76 /* PlayerBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291940F6451CD107AD5D4985 /* PlayerBarView.swift */; };
+		CFCD60F846A521E253ABDE77 /* DesktopLyrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D80003D1F6239781B24F90E /* DesktopLyrics.swift */; };
+		D14EC6EBFFF83B648660B262 /* PlayerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB82FE4013337C6A0C540C2 /* PlayerEngine.swift */; };
+		D776C32B99E9C901CB13B456 /* RecentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AD901A572F8334772E19ABE /* RecentStore.swift */; };
+		E0B2C831B1C22C01EC475E0F /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7421D03D934D68989633E83C /* TopBarView.swift */; };
+		E115C995E077BC1E2218BE2F /* QueuePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44D2D7C786C2D5D989429EC /* QueuePanel.swift */; };
+		EA71607E1BA52995492CC169 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B27C67DB915129A191123B46 /* AVFoundation.framework */; };
+		FCB68CBD8DD2444C6DFB01D4 /* LyricsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2A5BEEF912BB307BD3AEE5 /* LyricsEngine.swift */; };
+		FF0597751131C04AAC30CEF6 /* CoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6248E1C9F8B7340682B6D205 /* CoreService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		09F97B65281B031F2AE16DD6 /* Skins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skins.swift; sourceTree = "<group>"; };
+		0A2752DCAB4C32E260DDD8AE /* Kimo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kimo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13FE20107D8FA5CF3A38C1EC /* ArtistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsView.swift; sourceTree = "<group>"; };
+		162A6A88E6672A5CC9B6A4F1 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
+		1939C69381522C2E74348442 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		1CEA6F78C9CBADE862096844 /* RecentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentView.swift; sourceTree = "<group>"; };
+		1D6ED57779D404B0CA29EEA1 /* chiikawa-trio.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chiikawa-trio.png"; sourceTree = "<group>"; };
+		224ABEDFC6D6F0A7F4BCDBF1 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		291940F6451CD107AD5D4985 /* PlayerBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBarView.swift; sourceTree = "<group>"; };
+		2919D248D15AF0ECA98DD18A /* SkinChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinChrome.swift; sourceTree = "<group>"; };
+		2D45056C0FFB73274E36452D /* LocalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalView.swift; sourceTree = "<group>"; };
+		46F3F0BC52D7EAEC050ABB72 /* LikedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedView.swift; sourceTree = "<group>"; };
+		4AD901A572F8334772E19ABE /* RecentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentStore.swift; sourceTree = "<group>"; };
+		4D80003D1F6239781B24F90E /* DesktopLyrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopLyrics.swift; sourceTree = "<group>"; };
+		544097DC68306F1C78DFD7D4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
+		5ADFEE39C7E8224EC0AEEDB7 /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
+		6248E1C9F8B7340682B6D205 /* CoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreService.swift; sourceTree = "<group>"; };
+		64847E85E86F34E7F9DB2E94 /* LoginDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDialog.swift; sourceTree = "<group>"; };
+		698D74D42B513F20F0D5AA80 /* DetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViews.swift; sourceTree = "<group>"; };
+		6A30C0FC93154846122F6816 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		7421D03D934D68989633E83C /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
+		8AC1A78AADBE5528D3838AF3 /* wordmark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wordmark.png; sourceTree = "<group>"; };
+		8E5D2830A93F2638FA0DF6CF /* MiniPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayer.swift; sourceTree = "<group>"; };
+		9E830A541F95A4F62F7C83ED /* KimoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimoApp.swift; sourceTree = "<group>"; };
+		9F2A5BEEF912BB307BD3AEE5 /* LyricsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsEngine.swift; sourceTree = "<group>"; };
+		A328A0C203E1A72C39B9E5DE /* MusicCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCards.swift; sourceTree = "<group>"; };
+		A9119EE5066E77EC5A2E5655 /* LyricsDrawer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsDrawer.swift; sourceTree = "<group>"; };
+		AAF5A6AEDA684AD3CA9BDB12 /* SkinPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinPicker.swift; sourceTree = "<group>"; };
+		ABB82FE4013337C6A0C540C2 /* PlayerEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerEngine.swift; sourceTree = "<group>"; };
+		ACB957CAD1F3D447E09CC9D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		B27C67DB915129A191123B46 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		B5C345924B21EF798CC077DF /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		B696519D84EF3091E0D04955 /* VinylRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VinylRecord.swift; sourceTree = "<group>"; };
+		C44D2D7C786C2D5D989429EC /* QueuePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuePanel.swift; sourceTree = "<group>"; };
+		CAD7092C3DF4D7C6D9207F48 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CB257004AD9954B430CA85AC /* LocalLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalLibrary.swift; sourceTree = "<group>"; };
+		D777BB2437D688B808DA6AD0 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		D8C02C3C3CE75A03598D1E0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EE95C1FCDA5E29C4902DB977 /* Accent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accent.swift; sourceTree = "<group>"; };
+		F0D4564DB5B017E927F2E479 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		F1154428BC35C5F65A0A967E /* LikeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeStore.swift; sourceTree = "<group>"; };
+		F1194D9AD0BDB19AB944AB7A /* MusicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAPI.swift; sourceTree = "<group>"; };
+		F24E6804A8839F152A1D9607 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		F9657C149424E116F80BD12B /* Dbg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dbg.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E291673BA92C30ACC9ACC9CA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA71607E1BA52995492CC169 /* AVFoundation.framework in Frameworks */,
+				35CA8E9CA828691D1493A6AE /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		23E6B270FF0D21CACE23C522 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				1D6ED57779D404B0CA29EEA1 /* chiikawa-trio.png */,
+				F0D4564DB5B017E927F2E479 /* logo.png */,
+				8AC1A78AADBE5528D3838AF3 /* wordmark.png */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		2520AD203D9740AD4E13558F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9E830A541F95A4F62F7C83ED /* KimoApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		338635826C61C14FC774C911 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B5C345924B21EF798CC077DF /* AppKit.framework */,
+				B27C67DB915129A191123B46 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		39E73F5A84CA4326F31361B3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D8C02C3C3CE75A03598D1E0D /* Info.plist */,
+				23E6B270FF0D21CACE23C522 /* Assets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		4F0B847FD8D96DEA800A1146 /* Recent */ = {
+			isa = PBXGroup;
+			children = (
+				1CEA6F78C9CBADE862096844 /* RecentView.swift */,
+			);
+			path = Recent;
+			sourceTree = "<group>";
+		};
+		586CF814E43251F4713FEA4B /* Shell */ = {
+			isa = PBXGroup;
+			children = (
+				64847E85E86F34E7F9DB2E94 /* LoginDialog.swift */,
+				291940F6451CD107AD5D4985 /* PlayerBarView.swift */,
+				5ADFEE39C7E8224EC0AEEDB7 /* ShellView.swift */,
+				1939C69381522C2E74348442 /* SidebarView.swift */,
+				AAF5A6AEDA684AD3CA9BDB12 /* SkinPicker.swift */,
+				7421D03D934D68989633E83C /* TopBarView.swift */,
+			);
+			path = Shell;
+			sourceTree = "<group>";
+		};
+		5B0C463C345CE3F379C191CF /* Local */ = {
+			isa = PBXGroup;
+			children = (
+				2D45056C0FFB73274E36452D /* LocalView.swift */,
+			);
+			path = Local;
+			sourceTree = "<group>";
+		};
+		5C5138090CE77AD47C5C338D /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				CAD7092C3DF4D7C6D9207F48 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		631D3583E62E90FEAE382C03 /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				698D74D42B513F20F0D5AA80 /* DetailViews.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		67607C8AB8B22B693C1E0B01 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				EE95C1FCDA5E29C4902DB977 /* Accent.swift */,
+				ACB957CAD1F3D447E09CC9D3 /* Components.swift */,
+				5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */,
+				2919D248D15AF0ECA98DD18A /* SkinChrome.swift */,
+				09F97B65281B031F2AE16DD6 /* Skins.swift */,
+				6A30C0FC93154846122F6816 /* Tokens.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		73DBF3C4920AE4233B55E4CD /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				D777BB2437D688B808DA6AD0 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		787901C55A23605D9A681662 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A2752DCAB4C32E260DDD8AE /* Kimo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7B2F28F59EFD62265D32F981 /* Liked */ = {
+			isa = PBXGroup;
+			children = (
+				46F3F0BC52D7EAEC050ABB72 /* LikedView.swift */,
+			);
+			path = Liked;
+			sourceTree = "<group>";
+		};
+		7C51D3E1083B28590F2027AB /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				4D80003D1F6239781B24F90E /* DesktopLyrics.swift */,
+				A9119EE5066E77EC5A2E5655 /* LyricsDrawer.swift */,
+				8E5D2830A93F2638FA0DF6CF /* MiniPlayer.swift */,
+				C44D2D7C786C2D5D989429EC /* QueuePanel.swift */,
+				B696519D84EF3091E0D04955 /* VinylRecord.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		80D2FC11FC9A54F43CB320DD /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				FCD11EBB25851016659FB404 /* Artists */,
+				83D1168F79F3367E4ECF440C /* Components */,
+				631D3583E62E90FEAE382C03 /* Detail */,
+				73DBF3C4920AE4233B55E4CD /* Home */,
+				7B2F28F59EFD62265D32F981 /* Liked */,
+				5B0C463C345CE3F379C191CF /* Local */,
+				7C51D3E1083B28590F2027AB /* Player */,
+				4F0B847FD8D96DEA800A1146 /* Recent */,
+				5C5138090CE77AD47C5C338D /* Settings */,
+				586CF814E43251F4713FEA4B /* Shell */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		83D1168F79F3367E4ECF440C /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A328A0C203E1A72C39B9E5DE /* MusicCards.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		96834851539C1A20337FF054 /* Kimo */ = {
+			isa = PBXGroup;
+			children = (
+				2520AD203D9740AD4E13558F /* App */,
+				D14B05D1FAB7DCD5150A5272 /* Core */,
+				67607C8AB8B22B693C1E0B01 /* Design */,
+				80D2FC11FC9A54F43CB320DD /* Features */,
+				39E73F5A84CA4326F31361B3 /* Resources */,
+			);
+			path = Kimo;
+			sourceTree = "<group>";
+		};
+		D14B05D1FAB7DCD5150A5272 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				544097DC68306F1C78DFD7D4 /* AppModel.swift */,
+				224ABEDFC6D6F0A7F4BCDBF1 /* AppSettings.swift */,
+				162A6A88E6672A5CC9B6A4F1 /* AuthStore.swift */,
+				6248E1C9F8B7340682B6D205 /* CoreService.swift */,
+				F9657C149424E116F80BD12B /* Dbg.swift */,
+				F1154428BC35C5F65A0A967E /* LikeStore.swift */,
+				CB257004AD9954B430CA85AC /* LocalLibrary.swift */,
+				9F2A5BEEF912BB307BD3AEE5 /* LyricsEngine.swift */,
+				F24E6804A8839F152A1D9607 /* Models.swift */,
+				F1194D9AD0BDB19AB944AB7A /* MusicAPI.swift */,
+				ABB82FE4013337C6A0C540C2 /* PlayerEngine.swift */,
+				4AD901A572F8334772E19ABE /* RecentStore.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		EAABD39FAF6D927FB8CD882A = {
+			isa = PBXGroup;
+			children = (
+				96834851539C1A20337FF054 /* Kimo */,
+				338635826C61C14FC774C911 /* Frameworks */,
+				787901C55A23605D9A681662 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FCD11EBB25851016659FB404 /* Artists */ = {
+			isa = PBXGroup;
+			children = (
+				13FE20107D8FA5CF3A38C1EC /* ArtistsView.swift */,
+			);
+			path = Artists;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7E3D3F33804AAD9F3C2CDFC8 /* Kimo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EF9E4B5C950BBBDB2E09B09 /* Build configuration list for PBXNativeTarget "Kimo" */;
+			buildPhases = (
+				B7AA7848B0BA615FD455BE06 /* Sources */,
+				5000F99C0B203A337AA6CB19 /* Resources */,
+				E291673BA92C30ACC9ACC9CA /* Frameworks */,
+				0603F68654D1EE8D94FD1186 /* Bundle Core Runtime */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Kimo;
+			packageProductDependencies = (
+			);
+			productName = Kimo;
+			productReference = 0A2752DCAB4C32E260DDD8AE /* Kimo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		298BD229131513728D949675 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					7E3D3F33804AAD9F3C2CDFC8 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 9CA81E5B4D65C0BE29DAF6DF /* Build configuration list for PBXProject "Kimo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = EAABD39FAF6D927FB8CD882A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 787901C55A23605D9A681662 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7E3D3F33804AAD9F3C2CDFC8 /* Kimo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5000F99C0B203A337AA6CB19 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				974DC932C16A2D115035E6F4 /* chiikawa-trio.png in Resources */,
+				1068273071AB9619D69D3C8D /* logo.png in Resources */,
+				31C9E8FF0633E51C722892CF /* wordmark.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0603F68654D1EE8D94FD1186 /* Bundle Core Runtime */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle Core Runtime";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nSRC=\"$SRCROOT/CoreRuntime\"\nDST=\"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/CoreRuntime\"\nmkdir -p \"$DST\"\nrsync -a --delete --exclude node_modules --exclude .data \"$SRC\"/ \"$DST\"/\n# 开发期直接软链依赖树，避免每次构建复制 60MB；发布时改为真实拷贝。\nif [ -d \"$SRC/node_modules\" ]; then\n  rm -rf \"$DST/node_modules\"\n  ln -sfn \"$SRC/node_modules\" \"$DST/node_modules\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B7AA7848B0BA615FD455BE06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C933EC205893FAEF6265C6F /* Accent.swift in Sources */,
+				330723659D64B35EF06FD404 /* AppModel.swift in Sources */,
+				433C72C633917D326C346FD0 /* AppSettings.swift in Sources */,
+				71269D8857BEF360CE4D628E /* ArtistsView.swift in Sources */,
+				5E80B0147180CB3CDFDBBD5D /* AuthStore.swift in Sources */,
+				4CFC1C1DCB6A416610E42888 /* Components.swift in Sources */,
+				FF0597751131C04AAC30CEF6 /* CoreService.swift in Sources */,
+				6AF04E0DE607E577D3817341 /* Dbg.swift in Sources */,
+				CFCD60F846A521E253ABDE77 /* DesktopLyrics.swift in Sources */,
+				4F6B9ADC601F01E9CEE6ED8B /* DetailViews.swift in Sources */,
+				6B306CF029530C1F46C4C6C3 /* HomeView.swift in Sources */,
+				4F6F7B081A962802B6077095 /* KimoApp.swift in Sources */,
+				BBB9B0C36DD993E4C235E043 /* LikeStore.swift in Sources */,
+				27D7BA22710EF59019AF8A98 /* LikedView.swift in Sources */,
+				592E55B0D3CA7734D0408305 /* LocalLibrary.swift in Sources */,
+				933102D41036FB18E7064B89 /* LocalView.swift in Sources */,
+				B94FBB52E7E6A904DD1E4FAA /* LoginDialog.swift in Sources */,
+				7F59F5FE73A0ABBD7BED503E /* LyricsDrawer.swift in Sources */,
+				FCB68CBD8DD2444C6DFB01D4 /* LyricsEngine.swift in Sources */,
+				C297FE63E805513156085C1A /* MiniPlayer.swift in Sources */,
+				C8450F49D1CF42301A14E447 /* Models.swift in Sources */,
+				1F106B8AB29D75D5F4916E8F /* Motion.swift in Sources */,
+				603539F54B87163E8333F99C /* MusicAPI.swift in Sources */,
+				1840282C84533F571243F1D3 /* MusicCards.swift in Sources */,
+				CD0082F311F2601A0666FD76 /* PlayerBarView.swift in Sources */,
+				D14EC6EBFFF83B648660B262 /* PlayerEngine.swift in Sources */,
+				E115C995E077BC1E2218BE2F /* QueuePanel.swift in Sources */,
+				D776C32B99E9C901CB13B456 /* RecentStore.swift in Sources */,
+				A1DCAD7AD6207FACD745759F /* RecentView.swift in Sources */,
+				8A92B9349B5520290AC68821 /* SettingsView.swift in Sources */,
+				7679008123B50F10FB9CC7EF /* ShellView.swift in Sources */,
+				54D767174E81A407E57F5472 /* SidebarView.swift in Sources */,
+				913D078EF23A779D840AE7AE /* SkinChrome.swift in Sources */,
+				038F0318D2C251202E84F6C3 /* SkinPicker.swift in Sources */,
+				2C821758D8904266D4D5A320 /* Skins.swift in Sources */,
+				AAAA06EEB870A46A068BBDA1 /* Tokens.swift in Sources */,
+				E0B2C831B1C22C01EC475E0F /* TopBarView.swift in Sources */,
+				19F1149F1EAE6C8C73119983 /* VinylRecord.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A3AAE3F5477149B5AA55F058 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "-Xfrontend -disable-sandbox";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AF257508D3BD340425DA139C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Kimo/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kimo.music;
+				PRODUCT_NAME = Kimo;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E767EA2A458979833BF39ABC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-Xfrontend -disable-sandbox";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E824095D905B8C6531035E24 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Kimo/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kimo.music;
+				PRODUCT_NAME = Kimo;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6EF9E4B5C950BBBDB2E09B09 /* Build configuration list for PBXNativeTarget "Kimo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E824095D905B8C6531035E24 /* Debug */,
+				AF257508D3BD340425DA139C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9CA81E5B4D65C0BE29DAF6DF /* Build configuration list for PBXProject "Kimo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E767EA2A458979833BF39ABC /* Debug */,
+				A3AAE3F5477149B5AA55F058 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 298BD229131513728D949675 /* Project object */;
+}

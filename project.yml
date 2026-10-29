@@ -1,0 +1,55 @@
+name: Kimo
+options:
+  bundleIdPrefix: com.kimo
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGNING_REQUIRED: "NO"
+    ENABLE_HARDENED_RUNTIME: "NO"
+    # 受限环境下宏插件沙箱无法启动（sandbox-exec: Operation not permitted），
+    # 关掉编译器对插件子进程的二次沙箱；正常开发机可删除这一行。
+    OTHER_SWIFT_FLAGS: "-Xfrontend -disable-sandbox"
+
+targets:
+  Kimo:
+    type: application
+    platform: macOS
+    sources:
+      - path: Kimo
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kimo.music
+        PRODUCT_NAME: Kimo
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_FILE: Kimo/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        COMBINE_HIDPI_IMAGES: "YES"
+        ENABLE_PREVIEWS: "YES"
+    dependencies:
+      - sdk: AVFoundation.framework
+      - sdk: AppKit.framework
+    postBuildScripts:
+      - name: Bundle Core Runtime
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          SRC="$SRCROOT/CoreRuntime"
+          DST="$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/CoreRuntime"
+          mkdir -p "$DST"
+          rsync -a --delete --exclude node_modules --exclude .data "$SRC"/ "$DST"/
+          # 开发期直接软链依赖树，避免每次构建复制 60MB；发布时改为真实拷贝。
+          if [ -d "$SRC/node_modules" ]; then
+            rm -rf "$DST/node_modules"
+            ln -sfn "$SRC/node_modules" "$DST/node_modules"
+          fi

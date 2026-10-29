@@ -1,0 +1,22 @@
+# 构建产物
+.build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# 核心运行时依赖（npm install 生成）
+CoreRuntime/node_modules/
+CoreRuntime/.data/
+
+# 本地调试记录与接口响应样本
+.workbuddy/
+/det.json
+
+# 本地环境配置与日志
+.env
+.env.*
+!.env.example
+*.log
+
+# 系统
+.DS_Store
