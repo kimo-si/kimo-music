@@ -33,7 +33,7 @@ struct PlayerBarView: View {
 
     var body: some View {
         ZStack {
-            if theme.glassBlur > 0 {
+            if theme.usesGlassMaterial && theme.glassBlur > 0 {
                 Rectangle().fill(.ultraThinMaterial)
             }
             Rectangle().fill(theme.player)
@@ -125,10 +125,6 @@ struct PlayerBarView: View {
                     .contentTransition(.symbolEffect(.replace))
             }
             .help(currentLiked ? "取消喜欢" : "加入我喜欢")
-            IconButton(size: 30, radius: 9, muted: true, disabled: true) {
-            } content: {
-                Image(systemName: "bubble.left").font(.system(size: 16, weight: .light))
-            }
         }
     }
 
@@ -198,7 +194,7 @@ struct PlayerBarView: View {
                     .background(RoundedRectangle(cornerRadius: 7).fill(theme.chip))
             } action: {}
 
-            VolumeControl()
+            ThemedVolumeControl()
 
             Rectangle()
                 .fill(theme.playerHairline)
@@ -266,56 +262,6 @@ struct PlayerBarView: View {
     }
 }
 
-// MARK: - Volume
-
-private struct VolumeControl: View {
-    @Environment(AppModel.self) private var model
-    @Environment(\.theme) private var theme
-    @State private var hovering = false
-
-    var body: some View {
-        @Bindable var player = model.player
-
-        if theme.flavor == .hifi || theme.flavor == .liquid {
-            ThemedKnob(volume: $player.volume)
-        } else {
-            HStack(spacing: 8) {
-                Button {
-                    model.player.volume = model.player.volume > 0 ? 0 : 0.8
-                } label: {
-                    Image(systemName: iconName)
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundStyle(theme.textSecondary)
-                        .frame(width: 30, height: 30)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .hoverLift(active: hovering)
-
-                if hovering {
-                    Slider(value: $player.volume, in: 0...1)
-                        .controlSize(.mini)
-                        .tint(theme.accentStrong)
-                        .frame(width: 72)
-                        .transition(.opacity.combined(with: .move(edge: .leading)))
-                }
-            }
-            .onHover { h in
-                withAnimation(.easeOut(duration: 0.18)) { hovering = h }
-            }
-        }
-    }
-
-    private var iconName: String {
-        switch model.player.volume {
-        case 0: return "speaker.slash"
-        case ..<0.35: return "speaker"
-        case ..<0.7: return "speaker.wave.2"
-        default: return "speaker.wave.3"
-        }
-    }
-}
-
 // MARK: - Hover chip
 
 private struct HoverChip<Label: View>: View {
@@ -325,7 +271,7 @@ private struct HoverChip<Label: View>: View {
 
     var body: some View {
         Button(action: action, label: label)
-            .buttonStyle(.plain)
+            .buttonStyle(ThemedButtonStyle())
             .hoverLift(active: hovering)
             .onHover { hovering = $0 }
     }

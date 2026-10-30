@@ -2,14 +2,14 @@
 //  Skins.swift
 //  Kimo
 //
-//  内置皮肤。默认「雾紫玻璃」沿用原来的主题色和深浅色；
-//  其余皮肤自带整套配色和圆角，不跟主题色设置走。
+//  内置主题自带配色、圆角和控件材质；「雾紫玻璃」可跟随系统深浅色。
+//  RGB 纯色使用独立的 SolidPalette，切换主题不会覆盖用户颜色。
 //
 
 import SwiftUI
 
 enum SkinFlavor: String {
-    case standard, night, cream, hifi, liquid, record, mint, chiikawa
+    case solid, standard, night, cream, hifi, liquid, record, mint, chiikawa
 }
 
 enum SkinTexture: String {
@@ -93,10 +93,10 @@ enum Skin: String, CaseIterable, Identifiable {
         case .standard: return "原来的样子"
         case .night: return "冷静科技"
         case .cream: return "温暖生活"
-        case .hifi: return "胡桃木与香槟金"
+        case .hifi: return "胡桃木 · 实体按键 · 音量旋钮"
         case .liquid: return "Y2K 未来感"
-        case .record: return "纸感编辑风"
-        case .mint: return "轻快趣味"
+        case .record: return "纸张材质 · 印章按键 · 刻度轨道"
+        case .mint: return "立体按键 · 按压反馈 · 分段进度"
         case .chiikawa: return "吉伊 · 小八 · 乌萨奇"
         }
     }
@@ -370,28 +370,10 @@ struct SkinBackdrop: View {
     let theme: Theme
     /// 沉浸式页面（播放页）不想被窗口透明度拖到看不见，可以单独给一个不透明度。
     var opacityOverride: Double? = nil
-    /// 播放页面积大，色斑要更散一些，否则看起来是一块块圆斑。
-    var blurOverride: Double? = nil
 
     var body: some View {
         ZStack {
             theme.shell
-            if !theme.blobs.isEmpty {
-                GeometryReader { geo in
-                    let w = geo.size.width
-                    let h = geo.size.height
-                    ZStack {
-                        ForEach(Array(theme.blobs.enumerated()), id: \.offset) { index, color in
-                            let spot = spots[index % spots.count]
-                            Ellipse()
-                                .fill(color)
-                                .frame(width: w * spot.0, height: h * spot.1)
-                                .position(x: w * spot.2, y: h * spot.3)
-                        }
-                    }
-                    .blur(radius: max(8, blurOverride ?? theme.glassBlur * 1.1))
-                }
-            }
             switch theme.texture {
             case .fiber:
                 FiberOverlay()
@@ -405,17 +387,6 @@ struct SkinBackdrop: View {
         }
         .opacity(opacityOverride ?? theme.backdropOpacity)
         .ignoresSafeArea()
-    }
-
-    /// 色块的宽、高、x、y，按皮肤给的 blob 数量循环。
-    private var spots: [(CGFloat, CGFloat, CGFloat, CGFloat)] {
-        [
-            (0.28, 0.34, 0.14, 0.18),
-            (0.30, 0.36, 0.82, 0.12),
-            (0.34, 0.40, 0.70, 0.78),
-            (0.26, 0.30, 0.24, 0.84),
-            (0.22, 0.26, 0.48, 0.46),
-        ]
     }
 }
 

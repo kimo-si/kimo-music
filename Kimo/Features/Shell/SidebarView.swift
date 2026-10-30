@@ -143,7 +143,7 @@ private struct NavRow: View {
                     .foregroundStyle(active ? theme.accentStrong : theme.textSecondary)
                 if !collapsed {
                     Text(item.label)
-                        .font(.system(size: 15))
+                        .font(theme.controlFont(15))
                         .foregroundStyle(active ? theme.accentStrong : theme.textStrong)
                         .lineLimit(1)
                     Spacer(minLength: 0)
@@ -152,11 +152,12 @@ private struct NavRow: View {
             .padding(.horizontal, collapsed ? 11 : 14)
             .frame(width: collapsed ? 40 : nil, height: 40)
             .frame(maxWidth: collapsed ? nil : .infinity, alignment: .leading)
-            .background {
-                if active || hovering {
-                    RoundedRectangle(cornerRadius: theme.radiusCard, style: .continuous)
-                        .fill(active ? theme.navActive : theme.hover)
-                        .shadow(color: Color.black.opacity(active ? 0.05 : 0), radius: 6, y: 2)
+            .modifier(ThemedSurface(role: .selection, active: active, hovering: hovering,
+                                   radius: theme.radiusRow))
+            .overlay(alignment: .leading) {
+                if active {
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(theme.accentStrong).frame(width: 3, height: 16)
                 }
             }
             .contentShape(RoundedRectangle(cornerRadius: theme.radiusCard, style: .continuous))

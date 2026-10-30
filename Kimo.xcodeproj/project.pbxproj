@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		038F0318D2C251202E84F6C3 /* SkinPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF5A6AEDA684AD3CA9BDB12 /* SkinPicker.swift */; };
 		1068273071AB9619D69D3C8D /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = F0D4564DB5B017E927F2E479 /* logo.png */; };
+		1733E6BB20334C070AEF79BC /* SolidPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D020C6E43772AC82F8FF3B1 /* SolidPalette.swift */; };
 		1840282C84533F571243F1D3 /* MusicCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = A328A0C203E1A72C39B9E5DE /* MusicCards.swift */; };
 		19F1149F1EAE6C8C73119983 /* VinylRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B696519D84EF3091E0D04955 /* VinylRecord.swift */; };
 		1F106B8AB29D75D5F4916E8F /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */; };
@@ -18,6 +19,7 @@
 		330723659D64B35EF06FD404 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544097DC68306F1C78DFD7D4 /* AppModel.swift */; };
 		35CA8E9CA828691D1493A6AE /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5C345924B21EF798CC077DF /* AppKit.framework */; };
 		433C72C633917D326C346FD0 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224ABEDFC6D6F0A7F4BCDBF1 /* AppSettings.swift */; };
+		447C54A255FB4161F08045B1 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 79B82692684E83A7E24F5A4A /* AppIcon.icns */; };
 		4CFC1C1DCB6A416610E42888 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB957CAD1F3D447E09CC9D3 /* Components.swift */; };
 		4F6B9ADC601F01E9CEE6ED8B /* DetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698D74D42B513F20F0D5AA80 /* DetailViews.swift */; };
 		4F6F7B081A962802B6077095 /* KimoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E830A541F95A4F62F7C83ED /* KimoApp.swift */; };
@@ -32,11 +34,13 @@
 		7679008123B50F10FB9CC7EF /* ShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADFEE39C7E8224EC0AEEDB7 /* ShellView.swift */; };
 		7F59F5FE73A0ABBD7BED503E /* LyricsDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9119EE5066E77EC5A2E5655 /* LyricsDrawer.swift */; };
 		8A92B9349B5520290AC68821 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD7092C3DF4D7C6D9207F48 /* SettingsView.swift */; };
+		909F0C010750B6B336538E1D /* ThemeControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929A3CE244EF9E8FA6AEB67C /* ThemeControls.swift */; };
 		913D078EF23A779D840AE7AE /* SkinChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2919D248D15AF0ECA98DD18A /* SkinChrome.swift */; };
 		933102D41036FB18E7064B89 /* LocalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D45056C0FFB73274E36452D /* LocalView.swift */; };
 		974DC932C16A2D115035E6F4 /* chiikawa-trio.png in Resources */ = {isa = PBXBuildFile; fileRef = 1D6ED57779D404B0CA29EEA1 /* chiikawa-trio.png */; };
 		A1DCAD7AD6207FACD745759F /* RecentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA6F78C9CBADE862096844 /* RecentView.swift */; };
 		AAAA06EEB870A46A068BBDA1 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A30C0FC93154846122F6816 /* Tokens.swift */; };
+		B4E05642FE5653DB4F170286 /* ColorEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45D64425C6775DDB8A2DDF6F /* ColorEditor.swift */; };
 		B94FBB52E7E6A904DD1E4FAA /* LoginDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64847E85E86F34E7F9DB2E94 /* LoginDialog.swift */; };
 		BBB9B0C36DD993E4C235E043 /* LikeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1154428BC35C5F65A0A967E /* LikeStore.swift */; };
 		C297FE63E805513156085C1A /* MiniPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5D2830A93F2638FA0DF6CF /* MiniPlayer.swift */; };
@@ -64,8 +68,10 @@
 		291940F6451CD107AD5D4985 /* PlayerBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBarView.swift; sourceTree = "<group>"; };
 		2919D248D15AF0ECA98DD18A /* SkinChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinChrome.swift; sourceTree = "<group>"; };
 		2D45056C0FFB73274E36452D /* LocalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalView.swift; sourceTree = "<group>"; };
+		45D64425C6775DDB8A2DDF6F /* ColorEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorEditor.swift; sourceTree = "<group>"; };
 		46F3F0BC52D7EAEC050ABB72 /* LikedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedView.swift; sourceTree = "<group>"; };
 		4AD901A572F8334772E19ABE /* RecentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentStore.swift; sourceTree = "<group>"; };
+		4D020C6E43772AC82F8FF3B1 /* SolidPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidPalette.swift; sourceTree = "<group>"; };
 		4D80003D1F6239781B24F90E /* DesktopLyrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopLyrics.swift; sourceTree = "<group>"; };
 		544097DC68306F1C78DFD7D4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
@@ -75,8 +81,10 @@
 		698D74D42B513F20F0D5AA80 /* DetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViews.swift; sourceTree = "<group>"; };
 		6A30C0FC93154846122F6816 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		7421D03D934D68989633E83C /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
+		79B82692684E83A7E24F5A4A /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		8AC1A78AADBE5528D3838AF3 /* wordmark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wordmark.png; sourceTree = "<group>"; };
 		8E5D2830A93F2638FA0DF6CF /* MiniPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayer.swift; sourceTree = "<group>"; };
+		929A3CE244EF9E8FA6AEB67C /* ThemeControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeControls.swift; sourceTree = "<group>"; };
 		9E830A541F95A4F62F7C83ED /* KimoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimoApp.swift; sourceTree = "<group>"; };
 		9F2A5BEEF912BB307BD3AEE5 /* LyricsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsEngine.swift; sourceTree = "<group>"; };
 		A328A0C203E1A72C39B9E5DE /* MusicCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCards.swift; sourceTree = "<group>"; };
@@ -143,6 +151,7 @@
 		39E73F5A84CA4326F31361B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				79B82692684E83A7E24F5A4A /* AppIcon.icns */,
 				D8C02C3C3CE75A03598D1E0D /* Info.plist */,
 				23E6B270FF0D21CACE23C522 /* Assets */,
 			);
@@ -160,6 +169,7 @@
 		586CF814E43251F4713FEA4B /* Shell */ = {
 			isa = PBXGroup;
 			children = (
+				45D64425C6775DDB8A2DDF6F /* ColorEditor.swift */,
 				64847E85E86F34E7F9DB2E94 /* LoginDialog.swift */,
 				291940F6451CD107AD5D4985 /* PlayerBarView.swift */,
 				5ADFEE39C7E8224EC0AEEDB7 /* ShellView.swift */,
@@ -202,6 +212,8 @@
 				5976FC0A7DAE3B8DCBBC82AA /* Motion.swift */,
 				2919D248D15AF0ECA98DD18A /* SkinChrome.swift */,
 				09F97B65281B031F2AE16DD6 /* Skins.swift */,
+				4D020C6E43772AC82F8FF3B1 /* SolidPalette.swift */,
+				929A3CE244EF9E8FA6AEB67C /* ThemeControls.swift */,
 				6A30C0FC93154846122F6816 /* Tokens.swift */,
 			);
 			path = Design;
@@ -377,6 +389,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				447C54A255FB4161F08045B1 /* AppIcon.icns in Resources */,
 				974DC932C16A2D115035E6F4 /* chiikawa-trio.png in Resources */,
 				1068273071AB9619D69D3C8D /* logo.png in Resources */,
 				31C9E8FF0633E51C722892CF /* wordmark.png in Resources */,
@@ -417,6 +430,7 @@
 				433C72C633917D326C346FD0 /* AppSettings.swift in Sources */,
 				71269D8857BEF360CE4D628E /* ArtistsView.swift in Sources */,
 				5E80B0147180CB3CDFDBBD5D /* AuthStore.swift in Sources */,
+				B4E05642FE5653DB4F170286 /* ColorEditor.swift in Sources */,
 				4CFC1C1DCB6A416610E42888 /* Components.swift in Sources */,
 				FF0597751131C04AAC30CEF6 /* CoreService.swift in Sources */,
 				6AF04E0DE607E577D3817341 /* Dbg.swift in Sources */,
@@ -447,6 +461,8 @@
 				913D078EF23A779D840AE7AE /* SkinChrome.swift in Sources */,
 				038F0318D2C251202E84F6C3 /* SkinPicker.swift in Sources */,
 				2C821758D8904266D4D5A320 /* Skins.swift in Sources */,
+				1733E6BB20334C070AEF79BC /* SolidPalette.swift in Sources */,
+				909F0C010750B6B336538E1D /* ThemeControls.swift in Sources */,
 				AAAA06EEB870A46A068BBDA1 /* Tokens.swift in Sources */,
 				E0B2C831B1C22C01EC475E0F /* TopBarView.swift in Sources */,
 				19F1149F1EAE6C8C73119983 /* VinylRecord.swift in Sources */,

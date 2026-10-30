@@ -113,27 +113,29 @@ struct LyricsDrawer: View {
 
     private var backdrop: some View {
         ZStack {
-            // 窗口级 Backdrop 已负责皮肤底色、纹理和透明度；这里只叠加播放页氛围，
-            // 不再垫不透明纯色，否则透明模式会失效，顶部也会和页面主体断层。
-            if settings.lyricsBackground == "cover", let cover = player.current?.cover {
-                coverVeil(cover)
+            if theme.flavor != .solid {
+                // 窗口级 Backdrop 已负责皮肤底色、纹理和透明度；这里只叠加播放页氛围，
+                // 不再垫不透明纯色，否则透明模式会失效，顶部也会和页面主体断层。
+                if settings.lyricsBackground == "cover", let cover = player.current?.cover {
+                    coverVeil(cover)
+                }
+
+                RadialGradient(
+                    colors: [theme.accent.opacity(theme.isDark ? 0.10 : 0.06), .clear],
+                    center: UnitPoint(x: 0.28, y: 0.46),
+                    startRadius: 40,
+                    endRadius: 760
+                )
+
+                LinearGradient(
+                    colors: [
+                        .clear,
+                        theme.solid.opacity((theme.isDark ? 0.22 : 0.10) * theme.backdropOpacity)
+                    ],
+                    startPoint: .center,
+                    endPoint: .bottom
+                )
             }
-
-            RadialGradient(
-                colors: [theme.accent.opacity(theme.isDark ? 0.10 : 0.06), .clear],
-                center: UnitPoint(x: 0.28, y: 0.46),
-                startRadius: 40,
-                endRadius: 760
-            )
-
-            LinearGradient(
-                colors: [
-                    .clear,
-                    theme.solid.opacity((theme.isDark ? 0.22 : 0.10) * theme.backdropOpacity)
-                ],
-                startPoint: .center,
-                endPoint: .bottom
-            )
         }
         .ignoresSafeArea()
     }
@@ -369,12 +371,6 @@ struct LyricsDrawer: View {
                     .contentTransition(.symbolEffect(.replace))
             }
             .help(currentLiked ? "取消喜欢" : "加入我喜欢")
-
-            IconButton(size: 32, radius: 9, muted: true, disabled: true) {
-            } content: {
-                Image(systemName: "bubble.left")
-                    .font(.system(size: 15, weight: .light))
-            }
         }
     }
 
@@ -409,7 +405,7 @@ struct LyricsDrawer: View {
                     .font(.system(size: 13, weight: .semibold))
             }
 
-            LyricsPlayButton(playing: player.isPlaying) {
+            ThemedPlayButton(playing: player.isPlaying, size: 40) {
                 player.togglePlayPause()
             }
 
@@ -420,7 +416,7 @@ struct LyricsDrawer: View {
                     .font(.system(size: 13, weight: .semibold))
             }
 
-            LyricsVolumeButton()
+            ThemedVolumeControl()
         }
     }
 
@@ -429,7 +425,7 @@ struct LyricsDrawer: View {
             let ratio: CGFloat = player.duration > 0
                 ? min(1, max(0, CGFloat(player.progress / player.duration)))
                 : 0
-            LyricsSeekBar(ratio: ratio, dragging: draggingProgress, playing: player.isPlaying)
+            ThemedProgress(ratio: ratio, dragging: draggingProgress, playing: player.isPlaying, compact: true)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
@@ -490,110 +486,6 @@ struct LyricsDrawer: View {
         return String(format: "%02d:%02d", s / 60, s % 60)
     }
 
-}
-
-private struct LyricsPlayButton: View {
-    @Environment(\.theme) private var theme
-    let playing: Bool
-    let action: () -> Void
-    @State private var hovering = false
-
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(theme.accentStrong)
-                    .frame(width: 40, height: 40)
-                PlayPauseGlyph(playing: playing, size: 15, color: .white)
-            }
-            .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(playing ? "暂停" : "播放")
-        .hoverLift(active: hovering, amount: 1.08)
-        .onHover { hovering = $0 }
-        .shadow(color: theme.accent.opacity(hovering ? 0.45 : 0.22), radius: hovering ? 12 : 6)
-    }
-}
-
-private struct LyricsVolumeButton: View {
-    @Environment(AppModel.self) private var model
-    @Environment(\.theme) private var theme
-    @State private var hovering = false
-
-    var body: some View {
-        @Bindable var player = model.player
-        Button {
-            player.volume = player.volume > 0 ? 0 : 0.8
-        } label: {
-            Image(systemName: iconName)
-                .font(.system(size: 15, weight: .light))
-                .foregroundStyle(theme.textSecondary)
-                .frame(width: 32, height: 32)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .help(player.volume > 0 ? "静音" : "取消静音")
-        .overlay(alignment: .top) {
-            if hovering {
-                Slider(value: $player.volume, in: 0...1)
-                    .controlSize(.mini)
-                    .tint(theme.accentStrong)
-                    .frame(width: 84)
-                    .offset(y: -22)
-                    .transition(.opacity)
-            }
-        }
-        .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.16)) { self.hovering = hovering }
-        }
-    }
-
-    private var iconName: String {
-        switch model.player.volume {
-        case 0: return "speaker.slash"
-        case ..<0.35: return "speaker"
-        case ..<0.7: return "speaker.wave.2"
-        default: return "speaker.wave.3"
-        }
-    }
-}
-
-private struct LyricsSeekBar: View {
-    @Environment(\.theme) private var theme
-    let ratio: CGFloat
-    let dragging: Bool
-    let playing: Bool
-    @State private var hovering = false
-
-    private var lifted: Bool { hovering || dragging }
-    private var thickness: CGFloat { lifted ? 4 : 3 }
-
-    var body: some View {
-        GeometryReader { geo in
-            let width = max(0, geo.size.width * ratio)
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(theme.isDark ? Color.white.opacity(0.16) : theme.playerRail)
-                    .frame(height: thickness)
-                Capsule()
-                    .fill(theme.accentStrong)
-                    .frame(width: max(width, thickness), height: thickness)
-                    .shadow(color: theme.accent.opacity(playing ? 0.45 : 0.18), radius: playing ? 4 : 0)
-                if lifted {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 10, height: 10)
-                        .shadow(color: .black.opacity(0.22), radius: 2, y: 1)
-                        .offset(x: max(0, width - 5))
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .animation(.easeOut(duration: 0.14), value: lifted)
-            .contentShape(Rectangle())
-            .onHover { hovering = $0 }
-        }
-    }
 }
 
 // 描述播放页两侧切歌控件的方向与图标。

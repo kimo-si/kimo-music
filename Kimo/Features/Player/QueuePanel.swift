@@ -22,24 +22,24 @@ struct QueuePanel: View {
         }
         .frame(width: 380)
         .background {
-            if theme.glassBlur > 0 {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+            if theme.usesGlassMaterial && theme.glassBlur > 0 {
+                RoundedRectangle(cornerRadius: theme.radiusSheet, style: .continuous)
                     .fill(.ultraThinMaterial)
             }
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: theme.radiusSheet, style: .continuous)
                 .fill(theme.solid.opacity(0.96))
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: theme.radiusSheet, style: .continuous)
                 .strokeBorder(theme.glassEdge, lineWidth: 1)
         }
         .shadow(color: Color.black.opacity(0.22), radius: 30, y: 12)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: theme.radiusSheet, style: .continuous))
     }
 
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("播放列表")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(theme.titleFont(17, weight: .semibold))
                     .foregroundStyle(theme.textStrong)
                 Text(player.queue.isEmpty ? "列表是空的" : "共 \(player.queue.count) 首")
                     .font(.system(size: 12))

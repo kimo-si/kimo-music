@@ -10,23 +10,18 @@ import SwiftUI
 struct ThemedPlayButton: View {
     @Environment(\.theme) private var theme
     let playing: Bool
+    var size: CGFloat = 36
     let action: () -> Void
-    @State private var hovering = false
 
     var body: some View {
         Button(action: action) {
-            PlayPauseGlyph(playing: playing, size: 15, color: theme.accentStrong)
-                .frame(width: 36, height: 36)
+            PlayPauseGlyph(playing: playing, size: size * 0.38, color: theme.primaryButtonInk)
+                .frame(width: size, height: size)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemedButtonStyle(primary: true))
         .accessibilityLabel(playing ? "暂停" : "播放")
-        .padding(.horizontal, 4)
-        .hoverLift(active: hovering, amount: 1.12)
-        .onHover { hovering = $0 }
-        .shadow(color: theme.accent.opacity(hovering ? 0.35 : 0), radius: hovering ? 10 : 0)
     }
-
 }
 
 // 在不同播放控制栏中统一播放和暂停图标的切换效果。
@@ -47,55 +42,97 @@ struct PlayPauseGlyph: View {
     }
 }
 
+// 所有播放页面共用的主题进度条，紧凑模式只改变尺寸。
 struct ThemedProgress: View {
     @Environment(\.theme) private var theme
     let ratio: CGFloat
     let dragging: Bool
     let playing: Bool
+    var compact = false
+    var showsThumb = true
     @State private var hovering = false
 
-    private var lifted: Bool { hovering || dragging }
-    private var thickness: CGFloat { lifted ? 6 : 4 }
+    private var position: CGFloat { ratio.isFinite ? min(1, max(0, ratio)) : 0 }
+    private var thickness: CGFloat { compact ? 3 : (dragging || hovering ? 6 : 4) }
 
     var body: some View {
-        GeometryReader { geo in
-            let width = max(0, geo.size.width * ratio)
-            let knob: CGFloat = dragging ? 14 : 11
+        GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(theme.playerRail)
-                    .frame(height: thickness)
-
-                progressFill(width: width)
-                    .frame(width: max(width, thickness), height: thickness)
-                    .shadow(color: theme.accent.opacity(playing ? 0.7 : 0.35), radius: playing ? 7 : 3)
-
-                Circle()
-                    .fill(theme.accentStrong)
-                    .frame(width: knob, height: knob)
-                    .overlay(Circle().strokeBorder(Color.white.opacity(theme.isDark ? 0.9 : 1), lineWidth: 2))
-                    .shadow(color: theme.accent.opacity(0.55), radius: 5, y: 1)
-                    .offset(x: max(0, width - knob / 2))
+                rail(width: geometry.size.width)
+                if showsThumb { thumb(width: geometry.size.width) }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .animation(.easeOut(duration: 0.16), value: lifted)
-            .contentShape(Rectangle())
-            .onHover { hovering = $0 }
+        }
+        .contentShape(Rectangle())
+        .onHover { hovering = $0 }
+        .accessibilityHidden(true)
+    }
+
+    // 根据主题绘制连续轨道、刻度轨道或游戏机分段轨道。
+    @ViewBuilder
+    private func rail(width: CGFloat) -> some View {
+        if theme.controls.progress == .segmented {
+            SegmentedProgressRail(ratio: position, color: theme.accentStrong, track: theme.playerRail)
+                .frame(height: compact ? 4 : 6)
+        } else {
+            ZStack(alignment: .leading) {
+                Capsule().fill(theme.playerRail)
+                Capsule().fill(theme.accentStrong).frame(width: width * position)
+                if theme.controls.progress == .ruled {
+                    ProgressRuler(color: theme.textStrong.opacity(0.30))
+                }
+            }
+            .frame(height: thickness)
         }
     }
 
-    private func progressFill(width: CGFloat) -> some View {
-        ZStack(alignment: .leading) {
-            Capsule()
-                .fill(LinearGradient(
-                    colors: [theme.accent.opacity(0.82), theme.accentStrong],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-            if playing, theme.allowsMotion, !dragging, width > 12 {
-                ProgressSheen()
-                    .frame(width: width)
-                    .mask(Capsule())
+    // 拖动标记保持在轨道范围内，并随主题切换圆点、刻度指针或方块。
+    private func thumb(width: CGFloat) -> some View {
+        let ruler = theme.controls.progress == .ruled
+        let side: CGFloat = compact ? 8 : 10
+        let thumbWidth: CGFloat = ruler ? 4 : side
+        let radius: CGFloat = theme.controls.progress == .continuous ? side / 2 : 1.5
+        return RoundedRectangle(cornerRadius: radius)
+            .fill(theme.accentStrong)
+            .frame(width: thumbWidth, height: ruler ? side + 3 : side)
+            .shadow(color: theme.textStrong.opacity(0.18), radius: 1, y: 1)
+            .offset(x: min(max(0, width * position - thumbWidth / 2), max(0, width - thumbWidth)))
+    }
+}
+
+// 分段轨道按实际进度裁切填充，零进度不显示虚假的已播放部分。
+private struct SegmentedProgressRail: View {
+    let ratio: CGFloat
+    let color: Color
+    let track: Color
+
+    var body: some View {
+        Canvas { context, size in
+            let count = max(1, Int(size.width / 9))
+            let step = size.width / CGFloat(count)
+            for index in 0..<count {
+                let rect = CGRect(x: CGFloat(index) * step, y: 0, width: max(1, step - 2), height: size.height)
+                context.fill(Path(roundedRect: rect, cornerRadius: 1), with: .color(track))
+                let fill = max(0, min(rect.width, size.width * ratio - rect.minX))
+                if fill > 0 {
+                    context.fill(Path(CGRect(x: rect.minX, y: 0, width: fill, height: size.height)), with: .color(color))
+                }
+            }
+        }
+    }
+}
+
+// Hi-Fi 与唱片店使用静态刻度，不为装饰引入额外的动画循环。
+private struct ProgressRuler: View {
+    let color: Color
+
+    var body: some View {
+        Canvas { context, size in
+            let count = max(1, Int(size.width / 12))
+            for index in 1..<count {
+                let x = CGFloat(index) * size.width / CGFloat(count)
+                let rect = CGRect(x: x, y: 0, width: 1, height: size.height)
+                context.fill(Path(rect), with: .color(color))
             }
         }
     }
@@ -161,23 +198,42 @@ struct ProgressTimeHover: ViewModifier {
     }
 }
 
-/// 播放时沿已走过的进度滑过一道浅光。
-private struct ProgressSheen: View {
+// 主播放栏与歌词页复用音量控件，主题决定显示旋钮或滑块。
+struct ThemedVolumeControl: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.theme) private var theme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var hovering = false
+
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
-            let period = 2.2
-            let phase = context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: period) / period
-            GeometryReader { geo in
-                LinearGradient(
-                    colors: [.clear, Color.white.opacity(0.15), Color.white.opacity(0.8), .clear],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .frame(width: 56)
-                .offset(x: -56 + (geo.size.width + 56) * phase)
+        @Bindable var player = model.player
+        Group {
+            if theme.controls.usesKnob {
+                ThemedKnob(volume: $player.volume)
+            } else {
+                HStack(spacing: 8) {
+                    muteButton
+                    if hovering {
+                        Slider(value: $player.volume, in: 0...1)
+                            .controlSize(.mini).tint(theme.accentStrong).frame(width: 64)
+                            .accessibilityLabel("音量")
+                    }
+                }
+                .onHover { hovering = $0 }
             }
         }
-        .allowsHitTesting(false)
+        .animation(theme.allowsMotion && !reduceMotion ? .easeOut(duration: 0.16) : nil, value: hovering)
+    }
+
+    private var muteButton: some View {
+        IconButton(size: 30) {
+            model.player.volume = model.player.volume > 0 ? 0 : 0.8
+        } content: {
+            Image(systemName: model.player.volume == 0 ? "speaker.slash" : "speaker.wave.2")
+                .font(.system(size: 14))
+        }
+        .help(model.player.volume == 0 ? "取消静音" : "静音")
+        .accessibilityLabel(model.player.volume == 0 ? "取消静音" : "静音")
     }
 }
 
@@ -214,6 +270,22 @@ struct ThemedKnob: View {
                 }
         )
         .help("音量")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("音量")
+        .accessibilityValue("\(Int(volume * 100))%")
+        .accessibilityAdjustableAction { direction in
+            // 为辅助功能提供与拖动旋钮一致的有界音量调整。
+            adjustVolume(direction)
+        }
+    }
+
+    // 通过键盘和辅助功能按固定步长调整音量。
+    private func adjustVolume(_ direction: AccessibilityAdjustmentDirection) {
+        switch direction {
+        case .increment: volume = min(1, volume + 0.05)
+        case .decrement: volume = max(0, volume - 0.05)
+        @unknown default: break
+        }
     }
 
     private var ring: Color {

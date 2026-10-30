@@ -111,7 +111,7 @@ struct MiniPlayerView: View {
     private var cover: some View {
         ZStack {
             if let song = player.current {
-                CoverImage(url: song.cover, radius: 10, seed: song.id)
+                CoverImage(url: song.cover, radius: min(10, theme.radiusCard), seed: song.id)
             } else {
                 RoundedRectangle(cornerRadius: 10).fill(theme.chip)
                 Image(systemName: "music.note")
@@ -133,15 +133,9 @@ struct MiniPlayerView: View {
             .help("上一首")
             .accessibilityLabel("上一首")
 
-            Button {
+            ThemedPlayButton(playing: player.isPlaying, size: 34) {
                 player.togglePlayPause()
-            } label: {
-                PlayPauseGlyph(playing: player.isPlaying, size: 12, color: theme.accentStrong)
-                    .frame(width: 34, height: 34)
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(player.isPlaying ? "暂停" : "播放")
 
             IconButton(size: 30, radius: 9, muted: true, disabled: !player.canGoNext) {
                 player.next()
@@ -166,11 +160,9 @@ struct MiniPlayerView: View {
             let ratio = player.duration > 0
                 ? min(1, max(0, CGFloat(player.progress / player.duration)))
                 : 0
-            ZStack(alignment: .leading) {
-                Rectangle().fill(theme.playerRail)
-                Rectangle().fill(theme.accentStrong).frame(width: geo.size.width * ratio)
-            }
-            .frame(height: 3)
+            ThemedProgress(ratio: ratio, dragging: false, playing: player.isPlaying,
+                           compact: true, showsThumb: false)
+            .frame(height: 6)
             .frame(maxHeight: .infinity, alignment: .bottom)
         }
         .frame(height: 16)

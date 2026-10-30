@@ -85,7 +85,7 @@ final class AppModel {
     }
 
     var resolvedIsDark: Bool {
-        if let fixed = settings.skin.forcesDark { return fixed }
+        if let fixed = settings.fixedDarkAppearance { return fixed }
         switch settings.themeMode {
         case .light: return false
         case .dark: return true

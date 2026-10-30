@@ -164,6 +164,28 @@ final class MusicAPI {
         return J.array(dict, "lists").compactMap { Song.from($0) }
     }
 
+    // 输入联想来自酷狗搜索提示接口，空输入无需发起请求。
+    func searchSuggestions(_ keyword: String) async throws -> [String] {
+        let word = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !word.isEmpty else { return [] }
+        // 调用同一音乐核心，并沿用统一的接口状态校验。
+        let response = try await core.getRaw("/search/suggest", ["keywords": word, "musicTipCount": "6"])
+        let payload = try responseData(from: response, fallback: "搜索建议暂时不可用")
+        return Self.suggestionKeywords(from: payload)
+    }
+
+    // 仅提取通用词组，按上游顺序去重，最多展示六条。
+    static func suggestionKeywords(from payload: Any) -> [String] {
+        guard let group = (payload as? [JSON])?.first else { return [] }
+        var seen = Set<String>()
+        let words = J.array(group, "RecordDatas").compactMap { row -> String? in
+            guard let value = row["HintInfo"] as? String else { return nil }
+            let word = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            return !word.isEmpty && seen.insert(word).inserted ? word : nil
+        }
+        return Array(words.prefix(6))
+    }
+
     // MARK: - 歌单
 
     func playlistTracks(id: String, page: Int = 1, size: Int = 60) async throws -> [Song] {

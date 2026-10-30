@@ -9,6 +9,12 @@
 import Observation
 import SwiftUI
 
+enum AppearanceMode: String, CaseIterable, Identifiable {
+    case solid, theme
+    var id: String { rawValue }
+    var title: String { self == .solid ? "纯色" : "主题" }
+}
+
 enum ThemeMode: String, CaseIterable, Identifiable {
     case system, light, dark
     var id: String { rawValue }
@@ -58,6 +64,8 @@ final class AppSettings {
     /// 0–60px：面板毛玻璃强度，0 = 清透玻璃。
     var glassBlur: Double = 36 { didSet { save() } }
     var accentHex: String = "#9b87bf" { didSet { save() } }
+    var backgroundHex: String = AppearanceDefaults.backgroundHex { didSet { save() } }
+    var appearanceMode: AppearanceMode = .theme { didSet { save() } }
     var skin: Skin = .standard { didSet { save() } }
     var reduceMotion: Bool = false { didSet { save() } }
 
@@ -96,6 +104,8 @@ final class AppSettings {
     }
 
     private struct Snapshot: Codable {
+        var appearanceMode: String?
+        var backgroundHex: String?
         var themeMode: String?
         var windowEffect: String?
         var windowOpacity: Double?
@@ -122,23 +132,29 @@ final class AppSettings {
     }
 
     private var loading = false
+    private let storageURL: URL
 
-    init() {
+    // 允许检查脚本使用隔离的设置文件，避免修改用户的真实外观设置。
+    init(storageURL: URL? = nil) {
+        self.storageURL = storageURL ?? Self.fileURL
+        // 恢复已保存的设置，缺少的新字段继续使用默认值。
         load()
     }
 
     private func load() {
-        guard let data = try? Data(contentsOf: Self.fileURL),
+        guard let data = try? Data(contentsOf: storageURL),
               let s = try? JSONDecoder().decode(Snapshot.self, from: data) else { return }
         loading = true
         defer { loading = false }
 
+        // 独立恢复纯色模式和主题选择，并校验持久化颜色。
+        restoreAppearance(s)
         if let v = s.themeMode.flatMap(ThemeMode.init(rawValue:)) { themeMode = v }
         if let v = s.windowEffect.flatMap(WindowEffect.init(rawValue:)) { windowEffect = v }
         if let v = s.windowOpacity { windowOpacity = v }
         if let v = s.glassOpacity { glassOpacity = v }
         if let v = s.glassBlur { glassBlur = v }
-        if let v = s.accentHex { accentHex = v }
+        if let v = s.accentHex.flatMap(ColorMath.parseHex) { accentHex = v.hex }
         if let v = s.skin.flatMap(Skin.init(rawValue:)) { skin = v }
         if let v = s.reduceMotion { reduceMotion = v }
         if let v = s.quality { quality = v }
@@ -158,9 +174,17 @@ final class AppSettings {
         if let v = s.desktopLyricsStroke { desktopLyricsStroke = v }
     }
 
+    // 兼容旧设置文件：未记录模式时继续使用原来的内置主题。
+    private func restoreAppearance(_ snapshot: Snapshot) {
+        appearanceMode = snapshot.appearanceMode.flatMap(AppearanceMode.init(rawValue:)) ?? .theme
+        if let color = snapshot.backgroundHex.flatMap(ColorMath.parseHex) { backgroundHex = color.hex }
+    }
+
     private func save() {
         guard !loading else { return }
         let s = Snapshot(
+            appearanceMode: appearanceMode.rawValue,
+            backgroundHex: backgroundHex,
             themeMode: themeMode.rawValue,
             windowEffect: windowEffect.rawValue,
             windowOpacity: windowOpacity,
@@ -186,7 +210,7 @@ final class AppSettings {
             desktopLyricsStroke: desktopLyricsStroke
         )
         if let data = try? JSONEncoder().encode(s) {
-            try? data.write(to: Self.fileURL)
+            try? data.write(to: storageURL, options: .atomic)
         }
     }
 
@@ -198,6 +222,8 @@ final class AppSettings {
         glassOpacity = 100
         glassBlur = 36
         accentHex = "#9b87bf"
+        backgroundHex = AppearanceDefaults.backgroundHex
+        appearanceMode = .theme
         skin = .standard
         reduceMotion = false
         quality = "128"
@@ -216,6 +242,13 @@ final class AppSettings {
         desktopLyricsShowNext = true
         desktopLyricsStroke = true
     }
+
+    // 纯色按背景亮度匹配系统控件；主题使用自己的深浅色设计。
+    var fixedDarkAppearance: Bool? {
+        appearanceMode == .solid ? SolidPalette(backgroundHex: backgroundHex, accentHex: accentHex).isDark : skin.forcesDark
+    }
+
+    var appearanceTitle: String { appearanceMode == .solid ? "纯色自定义" : skin.title }
 
     // ── 派生值：透明度换算（与 ApplyAppearance.tsx 完全一致）──
 

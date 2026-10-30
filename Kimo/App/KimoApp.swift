@@ -16,7 +16,7 @@ struct KimoApp: App {
     @State private var auth = AuthStore()
 
     private var colorScheme: ColorScheme? {
-        if let fixed = model.settings.skin.forcesDark {
+        if let fixed = model.settings.fixedDarkAppearance {
             return fixed ? .dark : .light
         }
         switch model.settings.themeMode {

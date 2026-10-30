@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct RGB {
+struct RGB: Equatable {
     var r: Double
     var g: Double
     var b: Double
@@ -34,6 +34,36 @@ struct AccentPalette {
 }
 
 enum ColorMath {
+    // 在 RGB 空间内混合颜色，保留用户选择的背景色相。
+    static func mix(_ source: RGB, _ target: RGB, amount: Double) -> RGB {
+        let amount = clamp(amount)
+        return RGB(r: source.r + (target.r - source.r) * amount,
+                   g: source.g + (target.g - source.g) * amount,
+                   b: source.b + (target.b - source.b) * amount)
+    }
+
+    // 选择在所有承载面上对比度最高的黑白前景色。
+    static func foreground(on backgrounds: [RGB]) -> RGB {
+        let black = RGB(r: 0, g: 0, b: 0)
+        let white = RGB(r: 255, g: 255, b: 255)
+        return minimumContrast(black, on: backgrounds) >= minimumContrast(white, on: backgrounds) ? black : white
+    }
+
+    // 调整文字和强调色，确保自定义颜色在各承载面上仍然可读。
+    static func readable(_ color: RGB, on backgrounds: [RGB], ratio: Double = 4.5) -> RGB {
+        let target = foreground(on: backgrounds)
+        for step in 0...100 {
+            let candidate = mix(color, target, amount: Double(step) / 100)
+            if minimumContrast(candidate, on: backgrounds) >= ratio { return candidate }
+        }
+        return target
+    }
+
+    // 计算一个前景色在多种背景上的最差对比度。
+    static func minimumContrast(_ color: RGB, on backgrounds: [RGB]) -> Double {
+        backgrounds.map { contrast(color, $0) }.min() ?? 21
+    }
+
     static func clamp(_ v: Double, _ lo: Double = 0, _ hi: Double = 1) -> Double {
         min(hi, max(lo, v))
     }

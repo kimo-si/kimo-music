@@ -103,16 +103,17 @@ struct Theme {
     var solid: Color { Color(rgb: surfaceRGB) }
 
     // 交互
-    var hover: Color { isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.55) }
-    var hoverStrong: Color { isDark ? Color.white.opacity(0.12) : Color(rgb: raisedRGB, alpha: 0.8) }
-    var field: Color { isDark ? Color.white.opacity(0.06) : Color(rgb: raisedRGB, alpha: 0.7) }
-    var fieldFocus: Color { isDark ? Color.white.opacity(0.10) : Color(rgb: raisedRGB, alpha: 0.92) }
-    var chip: Color { isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.55) }
-    var rowHover: Color { isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.62) }
+    private var solidControlSurface: Color? { flavor == .solid ? Color(rgb: raisedRGB) : nil }
+    var hover: Color { solidControlSurface ?? (isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.55)) }
+    var hoverStrong: Color { solidControlSurface ?? (isDark ? Color.white.opacity(0.12) : Color(rgb: raisedRGB, alpha: 0.8)) }
+    var field: Color { solidControlSurface ?? Color(rgb: raisedRGB, alpha: isDark ? 0.76 : 0.70) }
+    var fieldFocus: Color { solidControlSurface ?? Color(rgb: raisedRGB, alpha: 0.92) }
+    var chip: Color { solidControlSurface ?? (isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.55)) }
+    var rowHover: Color { solidControlSurface ?? (isDark ? Color.white.opacity(0.07) : Color(rgb: raisedRGB, alpha: 0.62)) }
     var divider: Color { isDark ? Color.white.opacity(0.08) : Color(rgb: accentStrongRGB, alpha: 0.10) }
     var playerRail: Color { isDark ? Color.white.opacity(0.10) : Color(rgb: inkRGB, alpha: 0.14) }
     var playerHairline: Color { isDark ? Color.white.opacity(0.12) : Color(rgb: inkRGB, alpha: 0.12) }
-    var accentSoft: Color { Color(rgb: accentRGB, alpha: isDark ? 0.20 : 0.16) }
+    var accentSoft: Color { solidControlSurface ?? Color(rgb: accentRGB, alpha: isDark ? 0.20 : 0.16) }
     var inkScrim: Color { isDark ? Color.black.opacity(0.45) : Color(rgb: inkRGB, alpha: 0.22) }
 
     var shell: Color { Color(rgb: chrome.shellRGB) }
@@ -125,6 +126,8 @@ struct Theme {
     var serifTitles: Bool { chrome.serifTitles }
     var flavor: SkinFlavor { chrome.flavor }
     var texture: SkinTexture { chrome.texture }
+    var controls: ThemeControlTokens { .resolve(flavor: flavor) }
+    var usesGlassMaterial: Bool { controls.material == .glass || controls.material == .chrome }
 
     func titleFont(_ size: CGFloat, weight: Font.Weight = .medium) -> Font {
         serifTitles
@@ -136,10 +139,20 @@ struct Theme {
 
     @MainActor
     static func make(settings: AppSettings, isDark: Bool) -> Theme {
-        if let paint = settings.skin.paint {
+        if settings.appearanceMode == .solid {
+            return SolidPalette(backgroundHex: settings.backgroundHex, accentHex: settings.accentHex).make(settings: settings)
+        }
+        // 内置主题使用自己的配色，不覆盖用户单独保存的纯色设置。
+        return make(skin: settings.skin, settings: settings, isDark: isDark)
+    }
+
+    // 为实际界面和主题缩略图使用同一套主题构造逻辑。
+    @MainActor
+    static func make(skin: Skin, settings: AppSettings, isDark: Bool) -> Theme {
+        if let paint = skin.paint {
             return paint.make(settings: settings)
         }
-        let palette = ColorMath.accentPalette(hex: settings.accentHex, isDark: isDark)
+        let palette = ColorMath.accentPalette(hex: AppearanceDefaults.accentHex, isDark: isDark)
         return build(
             isDark: isDark,
             palette: palette,

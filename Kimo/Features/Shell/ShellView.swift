@@ -130,6 +130,7 @@ private struct MainColumn: View {
             TopBarView()
                 .frame(height: Metrics.topBarHeight)
                 .padding(.bottom, Metrics.topBarGap)
+                .zIndex(1)
 
             ContentSheet {
                 RouteView(route: model.route)
@@ -149,7 +150,7 @@ struct ContentSheet<Content: View>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 ZStack {
-                    if theme.glassBlur > 0 {
+                    if theme.usesGlassMaterial && theme.glassBlur > 0 {
                         Rectangle().fill(.ultraThinMaterial)
                     }
                     Rectangle().fill(theme.sheet)

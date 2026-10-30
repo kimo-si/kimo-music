@@ -78,16 +78,6 @@ struct VinylRecord: View {
                     )
                 )
 
-            if let url {
-                CoverImage(url: url, radius: side / 2, seed: seed)
-                    .frame(width: side, height: side)
-                    .opacity(0.11)
-                    .blur(radius: 1.4)
-                    .saturation(0.65)
-                    .clipShape(Circle())
-                    .blendMode(.overlay)
-            }
-
             VinylGrooves(side: side, labelRatio: 0.52, dark: theme.isDark)
 
             Circle()

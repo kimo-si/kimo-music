@@ -50,7 +50,7 @@ struct PlaylistCardView: View {
 
     private var cover: some View {
         ZStack {
-            CoverImage(url: playlist.cover, radius: Metrics.radiusCover, seed: playlist.id)
+            CoverImage(url: playlist.cover, radius: theme.radiusCard, seed: playlist.id)
                 .scaleEffect(hovering ? 1.05 : 1)
                 .animation(.spring(response: 0.42, dampingFraction: 0.85), value: hovering)
 
@@ -79,23 +79,16 @@ struct PlaylistCardView: View {
                 .padding(8)
             }
 
-            Button {
+            ThemedPlayButton(playing: false, size: 42) {
                 Task { await playAll() }
-            } label: {
-                Image(systemName: "play.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(theme.accentStrong)
-                    .frame(width: 48, height: 48)
-                    .background(Circle().fill(theme.fieldFocus))
-                    .shadow(color: .black.opacity(0.22), radius: 10, y: 4)
             }
-            .buttonStyle(.plain)
+            .accessibilityLabel("播放歌单：\(playlist.name)")
             .opacity(hovering ? 1 : 0)
             .offset(y: hovering ? -3 : 5)
             .animation(.spring(response: 0.34, dampingFraction: 0.8), value: hovering)
         }
         .aspectRatio(1, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: Metrics.radiusCover, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: theme.radiusCard, style: .continuous))
         .shadow(color: Color.black.opacity(hovering ? 0.16 : 0.08),
                 radius: hovering ? 14 : 9, y: hovering ? 10 : 6)
         .offset(y: hovering ? -3 : 0)
@@ -214,7 +207,7 @@ struct RowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .background(
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: theme.radiusRow)
                     .fill(configuration.isPressed ? theme.hover : Color.clear)
             )
     }
@@ -252,7 +245,7 @@ struct SongRowView: View {
                     .frame(width: 22, alignment: .trailing)
             }
             if showCover {
-                CoverImage(url: song.cover, radius: 6, seed: song.id)
+                CoverImage(url: song.cover, radius: min(10, theme.radiusCard), seed: song.id)
                     .frame(width: 40, height: 40)
             }
             VStack(alignment: .leading, spacing: 2) {
@@ -291,6 +284,11 @@ struct SongRowView: View {
         .background {
             RoundedRectangle(cornerRadius: theme.radiusRow, style: .continuous)
                 .fill(highlighted ? theme.nowPlaying : (hovering ? theme.rowHover : Color.clear))
+        }
+        .overlay(alignment: .bottom) {
+            if theme.controls.material == .paper {
+                Rectangle().fill(theme.divider).frame(height: 0.5)
+            }
         }
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
@@ -348,8 +346,13 @@ struct TrackTileView: View {
         }
         .padding(8)
         .background {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: theme.radiusRow, style: .continuous)
                 .fill(hovering ? theme.hover : Color.clear)
+        }
+        .overlay(alignment: .bottom) {
+            if theme.controls.material == .paper {
+                Rectangle().fill(theme.divider).frame(height: 0.5)
+            }
         }
         .contentShape(Rectangle())
         .onHover { hovering = $0 }

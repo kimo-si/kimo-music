@@ -16,12 +16,7 @@ struct SettingsView: View {
 
     private var settings: AppSettings { model.settings }
 
-    private let accentPresets: [(String, String)] = [
-        ("薰衣草", "#9b87bf"),
-        ("网易红", "#e5473e"),
-        ("海盐蓝", "#4a7fd4"),
-        ("薄荷绿", "#3faa86"),
-    ]
+    @State private var showAppearance = false
 
     private let qualities: [(String, String)] = [
         ("标准", "128"),
@@ -54,22 +49,30 @@ struct SettingsView: View {
     private var appearanceSection: some View {
         section(icon: "tshirt",
                 title: "外观",
-                description: "皮肤、深浅色、窗口透明与毛玻璃") {
-            row("当前皮肤", "从顶栏的皮肤按钮更换，选中后整套配色一起换") {
-                Text(settings.skin.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(theme.accentStrong)
+                description: "纯色、主题设计与窗口材质") {
+            row("外观类型", "纯色自由配色，主题提供完整的控件设计") {
+                AppearanceModePicker().frame(width: 190)
             }
 
-            row("外观模式", settings.skin == .standard
-                ? "跟随系统时，系统切换深浅色会自动同步"
-                : "这套皮肤自带深浅色，切回雾紫玻璃后再生效") {
+            row("外观设置", settings.appearanceTitle) {
+                Button(settings.appearanceMode == .solid ? "自定义颜色" : "选择主题") {
+                    showAppearance = true
+                }
+                .font(theme.controlFont(12))
+                .foregroundStyle(theme.accentStrong)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .buttonStyle(ThemedButtonStyle())
+                .popover(isPresented: $showAppearance) { SkinPicker() }
+            }
+
+            row("外观模式", appearanceModeHint) {
                 segmented(ThemeMode.allCases.map { ($0.label, $0.rawValue) },
                           selected: settings.themeMode.rawValue) { value in
                     if let mode = ThemeMode(rawValue: value) { settings.themeMode = mode }
                 }
-                .disabled(settings.skin != .standard)
-                .opacity(settings.skin == .standard ? 1 : 0.45)
+                .disabled(settings.fixedDarkAppearance != nil)
+                .opacity(settings.fixedDarkAppearance == nil ? 1 : 0.45)
             }
 
             groupLabel("窗口")
@@ -92,7 +95,7 @@ struct SettingsView: View {
                           enabled: settings.windowEffect != .none) { "\(Int($0))%" }
             }
 
-            groupLabel("面板毛玻璃")
+            groupLabel("面板与材质")
 
             row("面板不透明度", "内容区、播放栏和卡片的透明程度") {
                 sliderRow(value: Binding(get: { settings.glassOpacity },
@@ -100,21 +103,13 @@ struct SettingsView: View {
                           range: 0...100, step: 1) { "\(Int($0))%" }
             }
 
-            row("面板模糊", "面板背后内容的模糊程度，设为 0 时为清透玻璃") {
+            row("面板模糊", theme.usesGlassMaterial ? "玻璃主题的面板模糊程度，0 为清透填充" : "当前主题使用独立材质，玻璃主题下可调整模糊") {
                 sliderRow(value: Binding(get: { settings.glassBlur },
                                          set: { settings.glassBlur = $0 }),
-                          range: 0...60, step: 2) { "\(Int($0))px" }
+                          range: 0...60, step: 2, enabled: theme.usesGlassMaterial) { "\(Int($0))px" }
             }
 
-            groupLabel("颜色与显示")
-
-            row("主题色", settings.skin == .standard
-                ? "按钮、进度条、高亮等强调色，点最后一个色块可自定义"
-                : "这套皮肤自带配色，切回雾紫玻璃后可以改") {
-                accentPicker
-                    .disabled(settings.skin != .standard)
-                    .opacity(settings.skin == .standard ? 1 : 0.45)
-            }
+            groupLabel("显示")
 
             row("减弱动态效果", "关闭页面过渡、封面旋转等动画") {
                 Toggle("", isOn: Binding(get: { settings.reduceMotion },
@@ -135,29 +130,10 @@ struct SettingsView: View {
         }
     }
 
-    private var accentPicker: some View {
-        HStack(spacing: 8) {
-            ForEach(accentPresets, id: \.0) { _, hex in
-                Button {
-                    settings.accentHex = hex
-                } label: {
-                    Circle()
-                        .fill(Color(hex: hex))
-                        .frame(width: 22, height: 22)
-                        .overlay {
-                            Circle()
-                                .strokeBorder(theme.textStrong,
-                                              lineWidth: settings.accentHex.lowercased() == hex.lowercased() ? 2 : 0)
-                                .padding(-3)
-                        }
-                }
-                .buttonStyle(.plain)
-                .help(hex)
-            }
-
-            AccentColorWell(hex: Binding(get: { settings.accentHex },
-                                         set: { settings.accentHex = $0 }))
-        }
+    private var appearanceModeHint: String {
+        if settings.appearanceMode == .solid { return "文字和系统控件根据背景亮度自动匹配" }
+        return settings.skin.forcesDark == nil
+            ? "跟随系统时，系统切换深浅色会自动同步" : "这套主题使用独立设计的深浅色"
     }
 
     // MARK: - 播放
@@ -477,18 +453,13 @@ struct SettingsView: View {
                         .foregroundStyle(active ? theme.textStrong : theme.textSecondary)
                         .padding(.horizontal, 11)
                         .frame(height: 28)
-                        .background {
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                                .fill(active ? theme.hoverStrong : Color.clear)
-                                .shadow(color: .black.opacity(active ? 0.06 : 0), radius: 2, y: 1)
-                        }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ThemedButtonStyle(active: active))
             }
         }
         .padding(2)
         .background {
-            RoundedRectangle(cornerRadius: 9, style: .continuous).fill(theme.chip)
+            RoundedRectangle(cornerRadius: theme.controls.cornerRadius + 2).fill(theme.chip)
         }
     }
 
@@ -509,60 +480,5 @@ struct SettingsView: View {
         }
         .opacity(enabled ? 1 : 0.4)
         .disabled(!enabled)
-    }
-}
-
-// MARK: - 自定义颜色
-
-/// 圆形色块，点击打开系统取色器（比原生 ColorPicker 的胶囊外形更贴合这套 UI）。
-struct AccentColorWell: View {
-    @Binding var hex: String
-    @State private var coordinator = ColorWellCoordinator()
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color(hex: hex))
-                .frame(width: 22, height: 22)
-            Circle()
-                .strokeBorder(Color.primary.opacity(0.18), lineWidth: 1)
-                .frame(width: 22, height: 22)
-            Image(systemName: "plus")
-                .font(.system(size: 9, weight: .bold))
-                .foregroundStyle(.white.opacity(0.9))
-        }
-        .contentShape(Circle())
-        .onTapGesture {
-            coordinator.onChange = { color in
-                if let value = color.hexString { hex = value }
-            }
-            let panel = NSColorPanel.shared
-            panel.showsAlpha = false
-            panel.color = NSColor(Color(hex: hex))
-            panel.setTarget(coordinator)
-            panel.setAction(#selector(ColorWellCoordinator.colorChanged(_:)))
-            panel.makeKeyAndOrderFront(nil)
-        }
-        .help("自定义主题色")
-    }
-}
-
-final class ColorWellCoordinator: NSObject {
-    var onChange: ((NSColor) -> Void)?
-
-    @objc func colorChanged(_ sender: NSColorPanel) {
-        onChange?(sender.color)
-    }
-}
-
-// MARK: - Color → hex
-
-extension NSColor {
-    var hexString: String? {
-        guard let rgb = usingColorSpace(.sRGB) else { return nil }
-        return String(format: "#%02x%02x%02x",
-                      Int(round(rgb.redComponent * 255)),
-                      Int(round(rgb.greenComponent * 255)),
-                      Int(round(rgb.blueComponent * 255)))
     }
 }

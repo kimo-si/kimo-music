@@ -37,7 +37,7 @@ struct GlassPanel: ViewModifier {
                 )
                 ZStack {
                     // 面板模糊设为 0 时用清透填充，不叠毛玻璃层。
-                    if theme.glassBlur > 0 {
+                    if theme.usesGlassMaterial && theme.glassBlur > 0 {
                         shape.fill(.ultraThinMaterial)
                     }
                     shape.fill(tint ?? theme.sheet)
@@ -83,16 +83,12 @@ struct IconButton<Content: View>: View {
                 .font(.system(size: 15, weight: .regular))
                 .foregroundStyle(tint ?? (active ? theme.accentStrong : (muted ? theme.textSecondary : theme.textStrong)))
                 .frame(width: size, height: size)
-                .background(
-                    RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .fill(hovering && !disabled ? theme.hover : Color.clear)
-                )
+                .fontWeight(theme.controls.iconWeight)
                 .contentShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemedButtonStyle(active: active))
         .disabled(disabled)
-        .opacity(disabled ? 0.55 : 1)
-        .hoverLift(active: hovering, pressed: false, enabled: !disabled)
+        .brightness(hovering && !disabled ? (theme.isDark ? 0.05 : -0.025) : 0)
         .onHover { hovering = $0 && !disabled }
     }
 }
@@ -184,7 +180,7 @@ struct SectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.system(size: 20, weight: .medium))
+                .font(theme.titleFont(20))
                 .foregroundStyle(theme.textStrong)
             Spacer(minLength: 16)
             if let actionLabel {
@@ -213,12 +209,7 @@ struct ActionLinkStyle: ButtonStyle {
     @Environment(\.theme) private var theme
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(theme.accentSoft)
-                    .opacity(configuration.isPressed ? 1 : 0)
-            )
-            .onHover { _ in }
+            .modifier(ThemedSurface(active: configuration.isPressed))
     }
 }
 
@@ -238,7 +229,7 @@ struct TabBar: View {
                     withAnimation(.spring(response: 0.34, dampingFraction: 0.82)) { value = item }
                 } label: {
                     Text(item)
-                        .font(.system(size: 15))
+                        .font(theme.controlFont(15))
                         .foregroundStyle(active ? theme.accentStrong : theme.textSecondary)
                         .padding(.top, 2)
                         .padding(.bottom, 9)
