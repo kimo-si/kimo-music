@@ -8,6 +8,9 @@
 import SwiftUI
 
 enum PlayerMotion {
+    static let windowResizeDuration: TimeInterval = 0.44
+    static let windowRevealStart = 0.35
+
     static func lyricsAnimation(reduceMotion: Bool) -> Animation {
         reduceMotion
             ? .easeOut(duration: 0.16)

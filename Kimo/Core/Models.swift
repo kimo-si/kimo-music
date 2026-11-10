@@ -64,7 +64,7 @@ enum J {
 
 // MARK: - Models
 
-struct Song: Identifiable, Hashable {
+struct Song: Identifiable, Hashable, Codable {
     let id: String
     let hash: String
     let albumId: Int
@@ -76,6 +76,14 @@ struct Song: Identifiable, Hashable {
     let duration: TimeInterval
     /// 本地文件：有值时播放器直接播它，不走酷狗取流。
     var localURL: URL? = nil
+
+    // 使用音源身份比较歌曲，避免云端更新封面或 hash 后丢失当前曲高亮。
+    func matches(_ other: Song) -> Bool {
+        if let localURL { return localURL == other.localURL }
+        guard other.localURL == nil else { return false }
+        return hash.caseInsensitiveCompare(other.hash) == .orderedSame
+            || (albumAudioId > 0 && albumAudioId == other.albumAudioId)
+    }
 
     var durationText: String {
         let total = Int(duration.rounded())

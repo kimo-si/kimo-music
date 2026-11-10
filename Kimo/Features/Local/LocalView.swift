@@ -27,7 +27,7 @@ struct LocalView: View {
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .local)
                         }
                     }
                 }

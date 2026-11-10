@@ -21,7 +21,7 @@ struct RecentView: View {
                     HStack(spacing: 10) {
                         if !songs.isEmpty {
                             Button {
-                                if let first = songs.first { model.player.play(first, queue: songs) }
+                                if let first = songs.first { model.player.play(first, queue: songs, source: .recent) }
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "play.fill").font(.system(size: 12))
@@ -54,7 +54,7 @@ struct RecentView: View {
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.hash) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .recent)
                         }
                     }
                 }

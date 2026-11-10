@@ -39,6 +39,7 @@ targets:
     dependencies:
       - sdk: AVFoundation.framework
       - sdk: AppKit.framework
+      - sdk: MediaPlayer.framework
     postBuildScripts:
       - name: Bundle Core Runtime
         basedOnDependencyAnalysis: false

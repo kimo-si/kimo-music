@@ -241,8 +241,9 @@ enum Metrics {
     static let topBarHeight: CGFloat = 56
     static let topBarGap: CGFloat = 16
     static let playerHeight: CGFloat = 76
-    static let miniPlayerWidth: CGFloat = 420
-    static let miniPlayerHeight: CGFloat = 80
+    static let miniPlayerWidth: CGFloat = 480
+    static let miniPlayerHeight: CGFloat = 600
+    static let miniPlayerMinimumHeight: CGFloat = 420
     static let brandHeight: CGFloat = 50
     static let brandTopOffset: CGFloat = 22
 

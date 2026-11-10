@@ -1,171 +1,70 @@
-//
-//  MiniPlayer.swift
-//  Kimo
-//
-//  迷你模式：窗口收成一条胶囊，只留封面、曲名和传输控制。
-//  对应 cocomusic 的 MiniPlayer + use-mini-mode。
-//
-
+// 迷你模式：跟随当前皮肤的播放器与播放来源列表。
 import AppKit
 import SwiftUI
-
-@MainActor
-final class WindowBridge {
-    static let shared = WindowBridge()
-    weak var window: NSWindow?
-
-    private var normalFrame: NSRect?
-    private var pending: Bool?
-
-    /// 切换窗口尺寸与操作方式，退出迷你模式时恢复完整窗口。
-    func setMini(_ mini: Bool) {
-        guard let window else {
-            pending = mini
-            return
-        }
-        if mini {
-            normalFrame = window.frame
-            // 以整个窗口计算胶囊高度，保留顶部位置并压缩上下留白。
-            let target = NSRect(
-                x: window.frame.midX - Metrics.miniPlayerWidth / 2,
-                y: window.frame.maxY - Metrics.miniPlayerHeight,
-                width: Metrics.miniPlayerWidth,
-                height: Metrics.miniPlayerHeight
-            )
-            window.isMovableByWindowBackground = true
-            window.minSize = NSSize(width: Metrics.miniPlayerWidth, height: Metrics.miniPlayerHeight)
-            // 迷你胶囊是自绘窗口，红绿灯收起来；用右下角按钮回到完整界面。
-            for type in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
-                window.standardWindowButton(type)?.isHidden = true
-            }
-            window.setFrame(target, display: true, animate: true)
-            window.level = .normal
-        } else {
-            window.isMovableByWindowBackground = false
-            window.minSize = NSSize(width: 1100, height: 680)
-            for type in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
-                window.standardWindowButton(type)?.isHidden = false
-            }
-            // 恢复时把窗口拉回可用屏幕内。
-            var frame = normalFrame ?? NSRect(x: 0, y: 0, width: 1280, height: 820)
-            if let screen = window.screen ?? NSScreen.main {
-                frame.origin.x = min(max(frame.origin.x, screen.visibleFrame.minX),
-                                     screen.visibleFrame.maxX - frame.width)
-                frame.origin.y = min(max(frame.origin.y, screen.visibleFrame.minY),
-                                     screen.visibleFrame.maxY - frame.height)
-            }
-            window.setFrame(frame, display: true, animate: true)
-        }
-    }
-
-    /// 窗口还没挂上时先记下，等 NSWindow 就绪再套用。
-    func applyPending() {
-        guard let pending else { return }
-        self.pending = nil
-        setMini(pending)
-    }
-}
 
 struct MiniPlayerView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.theme) private var theme
 
-    private var player: PlayerEngine { model.player }
-
     var body: some View {
-        ZStack {
-            Backdrop(theme: theme)
-            HStack(spacing: 14) {
-                cover
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(player.current?.name ?? "未在播放")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(theme.textStrong)
-                        .lineLimit(1)
-                    Text(player.current?.artist ?? "选一首歌，开始聆听")
-                        .font(.system(size: 11))
-                        .foregroundStyle(theme.textSecondary)
-                        .lineLimit(1)
-                }
-                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-
-                controls
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 4)
-
-            // 底部进度细线
-            progressRail
-                .frame(maxHeight: .infinity, alignment: .bottom)
+        VStack(spacing: 12) {
+            header
+            MiniPlayerControls()
+            Rectangle().fill(theme.divider).frame(height: 1)
+            MiniSourceList()
         }
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .padding(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            if model.settings.windowEffect == .vibrancy {
+                WindowMaterial(material: .underWindowBackground)
+            }
+            Backdrop(theme: theme)
+            theme.sheet.opacity(0.5)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: theme.radiusSheet))
         .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: theme.radiusSheet)
                 .strokeBorder(theme.glassEdge, lineWidth: 1)
         }
         .ignoresSafeArea()
     }
 
-    private var cover: some View {
-        ZStack {
-            if let song = player.current {
-                CoverImage(url: song.cover, radius: min(10, theme.radiusCard), seed: song.id)
-            } else {
-                RoundedRectangle(cornerRadius: 10).fill(theme.chip)
-                Image(systemName: "music.note")
-                    .font(.system(size: 16, weight: .light))
-                    .foregroundStyle(theme.textMuted)
-            }
-        }
-        .frame(width: 54, height: 54)
-        .shadow(color: .black.opacity(0.18), radius: 5, y: 2)
-    }
-
-    private var controls: some View {
+    private var header: some View {
         HStack(spacing: 10) {
-            IconButton(size: 30, radius: 9, muted: true, disabled: !player.canGoPrevious) {
-                player.previous()
-            } content: {
-                Image(systemName: "backward.end").font(.system(size: 13, weight: .light))
-            }
-            .help("上一首")
-            .accessibilityLabel("上一首")
-
-            ThemedPlayButton(playing: player.isPlaying, size: 34) {
-                player.togglePlayPause()
-            }
-
-            IconButton(size: 30, radius: 9, muted: true, disabled: !player.canGoNext) {
-                player.next()
-            } content: {
-                Image(systemName: "forward.end").font(.system(size: 13, weight: .light))
-            }
-            .help("下一首")
-            .accessibilityLabel("下一首")
-
-            IconButton(size: 30, radius: 9, muted: true) {
+            Image(systemName: "waveform")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(theme.accentStrong)
+                .accessibilityHidden(true)
+            Text("Kimo")
+                .font(theme.titleFont(18, weight: .bold))
+                .foregroundStyle(theme.textStrong)
+            Spacer()
+            headerButton("恢复完整窗口", symbol: "arrow.up.left.and.arrow.down.right") {
+                // 通过窗口协调器恢复原有大窗尺寸和界面。
                 model.setMini(false)
-            } content: {
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                    .font(.system(size: 11, weight: .medium))
             }
-            .help("退出迷你模式")
+            pinButton
         }
+        .frame(height: 28)
+        .background { WindowDragArea() }
     }
 
-    private var progressRail: some View {
-        GeometryReader { geo in
-            let ratio = player.duration > 0
-                ? min(1, max(0, CGFloat(player.progress / player.duration)))
-                : 0
-            ThemedProgress(ratio: ratio, dragging: false, playing: player.isPlaying,
-                           compact: true, showsThumb: false)
-            .frame(height: 6)
-            .frame(maxHeight: .infinity, alignment: .bottom)
+    private var pinButton: some View {
+        let bridge = WindowBridge.shared
+        return headerButton(bridge.isMiniPinned ? "取消窗口置顶" : "窗口置顶",
+                            symbol: bridge.isMiniPinned ? "pin.fill" : "pin",
+                            active: bridge.isMiniPinned, action: bridge.toggleMiniPinned)
+            .accessibilityValue(bridge.isMiniPinned ? "已置顶" : "未置顶")
+    }
+
+    // 统一窗口按钮的主题外观、选中状态、提示和辅助功能名称。
+    private func headerButton(_ title: String, symbol: String, active: Bool = false,
+                              action: @escaping () -> Void) -> some View {
+        IconButton(size: 28, active: active, action: action) {
+            Image(systemName: symbol).font(.system(size: 14, weight: theme.controls.iconWeight))
         }
-        .frame(height: 16)
-        .modifier(ProgressTimeHover(duration: player.duration))
+        .help(title)
+        .accessibilityLabel(title)
     }
 }

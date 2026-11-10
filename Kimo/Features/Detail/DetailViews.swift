@@ -36,7 +36,7 @@ struct SearchView: View {
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .search(keyword: keyword))
                         }
                     }
                 }
@@ -79,7 +79,7 @@ struct PlaylistView: View {
                     cover: songs.first?.cover
                 ) {
                     Button {
-                        if let first = songs.first { model.player.play(first, queue: songs) }
+                        if let first = songs.first { model.player.play(first, queue: songs, source: .playlist(id: id, title: title)) }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "play.fill").font(.system(size: 12))
@@ -106,7 +106,7 @@ struct PlaylistView: View {
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .playlist(id: id, title: title))
                         }
                     }
                 }
@@ -149,7 +149,7 @@ struct RankView: View {
                     cover: songs.first?.cover
                 ) {
                     Button {
-                        if let first = songs.first { model.player.play(first, queue: songs) }
+                        if let first = songs.first { model.player.play(first, queue: songs, source: .rank(id: rankId, title: title)) }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "play.fill").font(.system(size: 12))
@@ -176,7 +176,7 @@ struct RankView: View {
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .rank(id: rankId, title: title))
                         }
                     }
                 }

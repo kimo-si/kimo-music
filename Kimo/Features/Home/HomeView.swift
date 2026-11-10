@@ -115,7 +115,7 @@ struct HomeView: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeader(title: "推荐歌曲", actionLabel: "播放全部") {
-                    if let first = songs.first { model.player.play(first, queue: songs) }
+                    if let first = songs.first { model.player.play(first, queue: songs, source: .recommended) }
                 }
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16, alignment: .top), count: 3),
                           alignment: .leading, spacing: 4) {
@@ -123,7 +123,7 @@ struct HomeView: View {
                         ForEach(0..<9, id: \.self) { _ in SkeletonBlock(radius: 10).frame(height: 48) }
                     } else {
                         ForEach(songs.prefix(9)) { song in
-                            TrackTileView(song: song, queue: songs)
+                            TrackTileView(song: song, queue: songs, source: .recommended)
                         }
                     }
                 }
@@ -295,7 +295,7 @@ private struct NewSongsView: View {
         } else {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 4) {
                 ForEach(Array(state.songs.enumerated()), id: \.element.id) { index, song in
-                    SongRowView(song: song, index: index + 1, queue: state.songs)
+                    SongRowView(song: song, index: index + 1, queue: state.songs, source: .newSongs)
                 }
             }
             pageFooter
@@ -329,6 +329,6 @@ private struct NewSongsView: View {
     private func playAll() {
         guard let first = state.songs.first else { return }
         // 将已加载的歌曲交给播放器作为队列。
-        model.player.play(first, queue: state.songs)
+        model.player.play(first, queue: state.songs, source: .newSongs)
     }
 }

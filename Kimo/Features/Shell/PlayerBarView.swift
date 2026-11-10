@@ -37,6 +37,7 @@ struct PlayerBarView: View {
                 Rectangle().fill(.ultraThinMaterial)
             }
             Rectangle().fill(theme.player)
+            PlayerWaveformBackground(levels: player.audioLevels, playing: player.isPlaying, volume: player.volume)
 
             VStack(spacing: 0) {
                 progressRail

@@ -67,15 +67,16 @@ final class AppModel {
     let lyrics = LyricsEngine()
     let likes = LikeStore()
 
-    init() {
-        let settings = AppSettings()
+    // 接受独立设置供预览和检查使用，正常启动仍加载用户设置与调试入口。
+    init(settings: AppSettings? = nil, configureDebug: Bool = true) {
+        let settings = settings ?? AppSettings()
         self.settings = settings
         self.player = PlayerEngine(settings: settings)
         player.onTrackStarted = { [weak self] song in
             self?.recent.record(song)
             self?.lyrics.ensure(for: song)
         }
-        applyDebugRoute()
+        if configureDebug { applyDebugRoute() }
     }
 
     /// 设置里的「深色」按钮：直接改 themeMode，而不是一个独立状态。
@@ -226,10 +227,12 @@ final class AppModel {
         route = next
     }
 
+    // 同步界面模式与窗口尺寸，播放器和来源列表保持原状态。
     func setMini(_ mini: Bool) {
-        guard mini != isMini else { return }
-        isMini = mini
-        WindowBridge.shared.setMini(mini)
+        // 先保留旧界面快照，再切换布局；动画期间的新请求由窗口协调器合并。
+        WindowBridge.shared.setMini(mini, reduceMotion: settings.reduceMotion) { [weak self] in
+            self?.isMini = mini
+        }
     }
 
     func toggleSidebar() {

@@ -25,7 +25,7 @@ struct LikedView: View {
                     if auth.isLoggedIn, !likes.songs.isEmpty {
                         Button {
                             if let first = likes.songs.first {
-                                model.player.play(first, queue: likes.songs)
+                                model.player.play(first, queue: likes.songs, source: .liked)
                             }
                         } label: {
                             HStack(spacing: 6) {
@@ -76,7 +76,7 @@ struct LikedView: View {
         } else {
             LazyVStack(spacing: 2) {
                 ForEach(Array(likes.songs.enumerated()), id: \.element.hash) { index, song in
-                    SongRowView(song: song, index: index + 1, queue: likes.songs)
+                    SongRowView(song: song, index: index + 1, queue: likes.songs, source: .liked)
                 }
             }
         }

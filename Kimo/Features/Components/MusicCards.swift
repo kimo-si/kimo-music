@@ -95,10 +95,11 @@ struct PlaylistCardView: View {
         .animation(.spring(response: 0.36, dampingFraction: 0.85), value: hovering)
     }
 
+    // 获取歌单歌曲，并将歌单身份与播放队列一起保存。
     private func playAll() async {
         guard let songs = try? await MusicAPI.shared.playlistTracks(id: playlist.id, size: 60),
               let first = songs.first else { return }
-        model.player.play(first, queue: songs)
+        model.player.play(first, queue: songs, source: .playlist(id: playlist.id, title: playlist.name))
     }
 }
 
@@ -144,7 +145,7 @@ struct ChartCardView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     ForEach(Array(songs.prefix(4).enumerated()), id: \.offset) { index, song in
                         Button {
-                            model.player.play(song, queue: songs)
+                            model.player.play(song, queue: songs, source: .rank(id: chart.id, title: chart.name))
                         } label: {
                             HStack(spacing: 8) {
                                 Text("\(index + 1)")
@@ -221,6 +222,7 @@ struct SongRowView: View {
     let song: Song
     let index: Int?
     let queue: [Song]
+    var source: PlaybackSource = .queue
     var showCover = true
 
     @State private var hovering = false
@@ -267,7 +269,7 @@ struct SongRowView: View {
             }
             if hovering {
                 Button {
-                    model.player.play(song, queue: queue)
+                    model.player.play(song, queue: queue, source: source)
                 } label: {
                     Image(systemName: "play.fill")
                         .font(.system(size: 12))
@@ -300,11 +302,12 @@ struct SongRowView: View {
     }
 
     /// 双击行为由设置决定：replace = 播放整个列表，insert = 只插到当前曲后面。
+    // 播放或插播时显式携带列表来源，避免依赖当前页面推断。
     private func playSong(double: Bool) {
         if double, model.settings.doubleClick == "insert" {
-            model.player.insertNext(song)
+            model.player.insertNext(song, context: PlaybackContext(source: source, songs: queue))
         } else {
-            model.player.play(song, queue: queue)
+            model.player.play(song, queue: queue, source: source)
         }
     }
 }
@@ -316,6 +319,7 @@ struct TrackTileView: View {
     @Environment(\.theme) private var theme
     let song: Song
     let queue: [Song]
+    var source: PlaybackSource = .queue
 
     @State private var hovering = false
 
@@ -363,11 +367,12 @@ struct TrackTileView: View {
         )
     }
 
+    // 播放或插播时显式携带列表来源，避免依赖当前页面推断。
     private func playSong(double: Bool) {
         if double, model.settings.doubleClick == "insert" {
-            model.player.insertNext(song)
+            model.player.insertNext(song, context: PlaybackContext(source: source, songs: queue))
         } else {
-            model.player.play(song, queue: queue)
+            model.player.play(song, queue: queue, source: source)
         }
     }
 }

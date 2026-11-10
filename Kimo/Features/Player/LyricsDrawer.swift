@@ -84,13 +84,6 @@ struct LyricsDrawer: View {
             }
         }
         .contentShape(Rectangle())
-        .simultaneousGesture(
-            DragGesture(minimumDistance: Self.dragRecognitionDistance)
-                .onEnded { value in
-                    // 判断拖动方向和距离，满足条件时返回上一页。
-                    dismissOnDrag(value.translation)
-                }
-        )
         .onAppear {
             engine.ensure(for: player.current)
             revealStage()
@@ -165,6 +158,8 @@ struct LyricsDrawer: View {
                 .scaleEffect(stageReady ? 1 : 0.9)
                 .opacity(stageReady ? 1 : 0.28)
                 .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .simultaneousGesture(dismissGesture)
             lyricsColumn
                 .offset(y: stageReady ? 0 : 18)
                 .opacity(stageReady ? 1 : 0)
@@ -203,6 +198,11 @@ struct LyricsDrawer: View {
         }
     }
 
+    private var dismissGesture: some Gesture {
+        DragGesture(minimumDistance: Self.dragRecognitionDistance)
+            .onEnded { dismissOnDrag($0.translation) }
+    }
+
     // 向下拖动达到阈值且以纵向为主时收起播放页。
     private func dismissOnDrag(_ translation: CGSize) {
         guard translation.height >= Self.dismissDragDistance,
@@ -211,97 +211,37 @@ struct LyricsDrawer: View {
         closeLyrics()
     }
 
+    @ViewBuilder
     private var lyricsColumn: some View {
-        lyricsList
-            .frame(maxHeight: .infinity)
-    }
-
-    private var lyricsList: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: settings.lyricsAlign == .center ? .center : .leading, spacing: 0) {
-                    if loading && lines.isEmpty {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(theme.accent)
-                            .padding(.top, 40)
-                    } else if lines.isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("暂无歌词")
-                                .font(.system(size: 15))
-                                .foregroundStyle(theme.textMuted)
-                            if let lyricError = engine.errorText {
-                                Text(lyricError)
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(theme.textMuted.opacity(0.8))
-                                    .lineLimit(3)
-                            }
-                        }
-                        .padding(.top, 40)
-                    } else {
-                        ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
-                            lyricLine(line, index: index)
-                                .id(index)
-                        }
-                    }
-                }
-                .padding(.vertical, 200)
-                .padding(.bottom, settings.showLyricsPlayerBar ? 56 : 0)
-                .frame(maxWidth: .infinity, alignment: settings.lyricsAlign == .center ? .center : .leading)
+        if !lines.isEmpty {
+            PlaybackLyricsList(lines: lines, currentIndex: currentIndex,
+                               centered: settings.lyricsAlign == .center,
+                               fontSize: settings.lyricsFontSize,
+                               timeLabel: { timeText(seekTime(for: $0)) }) { line in
+                // 点击和拖动松手共用定位入口，保留播放器的播放或暂停状态。
+                player.seek(to: seekTime(for: line))
             }
-            .mask {
-                LinearGradient(
-                    stops: [
-                        .init(color: .clear, location: 0),
-                        .init(color: .black, location: 0.18),
-                        .init(color: .black, location: settings.showLyricsPlayerBar ? 0.70 : 0.82),
-                        .init(color: .clear, location: 1),
-                    ],
-                    startPoint: .top, endPoint: .bottom
-                )
-            }
-            .onChange(of: currentIndex) { _, idx in
-                guard let idx else { return }
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
-                    proxy.scrollTo(idx, anchor: .center)
-                }
-            }
-            .onAppear {
-                if let idx = currentIndex {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        proxy.scrollTo(idx, anchor: .center)
+            .id(player.current?.id)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                if loading {
+                    ProgressView().controlSize(.small).tint(theme.accent)
+                } else {
+                    Text("暂无歌词").font(.system(size: 15))
+                    if let message = engine.errorText {
+                        Text(message).font(.system(size: 11)).lineLimit(3)
                     }
                 }
             }
+            .foregroundStyle(theme.textMuted)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
     }
 
-    private func lyricLine(_ line: MusicAPI.LyricLine, index: Int) -> some View {
-        let active = index == currentIndex
-        let distance = abs(index - (currentIndex ?? index))
-        let fade: Double = {
-            if active { return 1 }
-            switch distance {
-            case 1: return 0.50
-            case 2: return 0.36
-            case 3: return 0.28
-            default: return 0.20
-            }
-        }()
-        let centered = settings.lyricsAlign == .center
-        let size = settings.lyricsFontSize * (active ? 1.22 : 1)
-        return Text(line.text)
-            .font(.system(size: size, weight: active ? .semibold : .regular))
-            .foregroundStyle(active ? theme.textStrong : theme.textSecondary.opacity(fade))
-            .multilineTextAlignment(centered ? .center : .leading)
-            .padding(.horizontal, 8)
-            .padding(.vertical, active ? 9 : 7)
-            .frame(maxWidth: .infinity, alignment: centered ? .center : .leading)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                player.seek(to: line.time)
-            }
-            .animation(settings.reduceMotion ? nil : .easeOut(duration: 0.28), value: active)
+    /// 将歌词时间还原为播放器时间，兼容歌词偏移和歌曲首尾。
+    private func seekTime(for line: MusicAPI.LyricLine) -> TimeInterval {
+        let seconds = max(0, line.time - settings.lyricsOffset / 1000)
+        return player.duration > 0 ? min(seconds, player.duration) : seconds
     }
 
     // MARK: 播放栏
@@ -486,6 +426,156 @@ struct LyricsDrawer: View {
         return String(format: "%02d:%02d", s / 60, s % 60)
     }
 
+}
+
+// 记录每行的真实边界，长句换行或调整字号后仍能对准中心。
+private struct LyricRowBounds: PreferenceKey {
+    static var defaultValue: [Anchor<CGRect>] { [] }
+
+    /// 按歌词顺序收集布局完成后的行边界。
+    static func reduce(value: inout [Anchor<CGRect>], nextValue: () -> [Anchor<CGRect>]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+private struct LyricDragPreview {
+    let centers: [CGFloat]
+    let midpoint: CGFloat
+    var offset: CGFloat = 0
+    var index = 0
+
+    /// 限制首尾拖动距离，并选择距视口中心最近的歌词。
+    mutating func move(by translation: CGFloat) {
+        guard let first = centers.first, let last = centers.last else { return }
+        offset = min(midpoint - first, max(midpoint - last, translation))
+        let target = midpoint - offset
+        index = centers.indices.min { abs(centers[$0] - target) < abs(centers[$1] - target) } ?? 0
+    }
+}
+
+private struct PlaybackLyricsList: View {
+    @Namespace private var viewportSpace
+    @Environment(\.theme) private var theme
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @GestureState private var translation: CGFloat?
+    @State private var dragOrigin: LyricDragPreview?
+
+    let lines: [MusicAPI.LyricLine]
+    let currentIndex: Int?
+    let centered: Bool
+    let fontSize: CGFloat
+    let timeLabel: (MusicAPI.LyricLine) -> String
+    let seek: (MusicAPI.LyricLine) -> Void
+
+    private var preview: LyricDragPreview? {
+        guard var target = dragOrigin, let translation else { return nil }
+        target.move(by: translation)
+        return target
+    }
+
+    private var lineAnimation: Animation? {
+        theme.allowsMotion && !systemReduceMotion ? .easeInOut(duration: 0.35) : nil
+    }
+
+    var body: some View {
+        let selection = preview
+        let focus = selection?.index ?? currentIndex
+        return GeometryReader { viewport in
+            ScrollViewReader { proxy in
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
+                            row(line, index: index, focus: focus).id(index)
+                        }
+                    }
+                    .padding(.vertical, viewport.size.height / 2)
+                    .offset(y: selection?.offset ?? 0)
+                    .overlayPreferenceValue(LyricRowBounds.self) { bounds in
+                        gestureSurface(bounds, viewportHeight: viewport.size.height, proxy: proxy)
+                    }
+                }
+                .coordinateSpace(name: viewportSpace)
+                .mask(LinearGradient(colors: [.clear, .black, .black, .clear],
+                                     startPoint: .top, endPoint: .bottom))
+                .onChange(of: currentIndex, initial: true) { old, index in
+                    guard translation == nil, let index else { return }
+                    // 手动拖动期间暂停跟随，正常播放时将新行平滑移到中心。
+                    withAnimation(old == index ? nil : lineAnimation) { proxy.scrollTo(index, anchor: .center) }
+                }
+                .overlay(alignment: .bottom) { previewHint(selection?.index) }
+            }
+        }
+    }
+
+    /// 用视觉缩放和淡入淡出切换焦点，保持每行占用的布局高度稳定。
+    private func row(_ line: MusicAPI.LyricLine, index: Int, focus: Int?) -> some View {
+        let active = focus == index
+        let distance = abs(index - (focus ?? 0))
+        let opacity = active ? 1.0 : max(0.26, 0.62 - Double(distance) * 0.09)
+        return Text(line.text)
+            .font(.system(size: fontSize * 1.18, weight: .medium))
+            .foregroundStyle(theme.textStrong)
+            .multilineTextAlignment(centered ? .center : .leading)
+            .scaleEffect(active ? 1 : 0.86, anchor: centered ? .center : .leading)
+            .opacity(opacity)
+            .animation(translation == nil ? lineAnimation : nil, value: focus)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: centered ? .center : .leading)
+            .anchorPreference(key: LyricRowBounds.self, value: .bounds) { [$0] }
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { seek(line) }
+    }
+
+    /// 在固定视口内区分点击与拖动，拖动使用起始位置快照，不受歌词移动影响。
+    private func gestureSurface(_ bounds: [Anchor<CGRect>], viewportHeight: CGFloat, proxy: ScrollViewProxy) -> some View {
+        GeometryReader { geo in
+            let drag = DragGesture(minimumDistance: 5)
+                .updating($translation) { value, state, _ in
+                    guard bounds.count == lines.count else { return }
+                    if state == nil {
+                        let midpoint = viewportHeight / 2 - geo.frame(in: .named(viewportSpace)).minY
+                        dragOrigin = LyricDragPreview(centers: bounds.map { geo[$0].midY }, midpoint: midpoint)
+                    }
+                    state = value.translation.height
+                }
+                .onEnded { value in
+                    // GestureState 在松手回调前可能已复位，使用按下时的快照完成定位。
+                    guard var target = dragOrigin else { return }
+                    dragOrigin = nil
+                    target.move(by: value.translation.height)
+                    // 松手后只定位一次，同时将选中的歌词对齐到中心。
+                    select(target.index, proxy: proxy)
+                }
+            Color.clear.contentShape(Rectangle())
+                .gesture(drag.exclusively(before: SpatialTapGesture().onEnded { tap in
+                    if let index = bounds.firstIndex(where: { geo[$0].contains(tap.location) }) {
+                        select(index, proxy: proxy)
+                    }
+                }))
+                .accessibilityHidden(true)
+        }
+    }
+
+    /// 同步视觉焦点和播放位置，包括停在同一行的情况。
+    private func select(_ index: Int, proxy: ScrollViewProxy) {
+        guard lines.indices.contains(index) else { return }
+        proxy.scrollTo(index, anchor: .center)
+        seek(lines[index])
+    }
+
+    /// 拖动时显示松手将要跳转的时间。
+    @ViewBuilder private func previewHint(_ index: Int?) -> some View {
+        if let index, lines.indices.contains(index) {
+            Text("\(timeLabel(lines[index]))  ·  松开跳转")
+                .font(.system(size: 12, weight: .medium).monospacedDigit())
+                .foregroundStyle(theme.textStrong)
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(Capsule().fill(theme.chip))
+                .padding(.bottom, 16)
+                .allowsHitTesting(false)
+        }
+    }
 }
 
 // 描述播放页两侧切歌控件的方向与图标。

@@ -75,7 +75,7 @@ struct QueuePanel: View {
                     ForEach(Array(player.queue.enumerated()), id: \.offset) { index, song in
                         QueueRow(song: song,
                                  index: index,
-                                 isCurrent: player.current == song)
+                                 isCurrent: player.index == index)
                             .id(index)
                     }
                 }
@@ -109,7 +109,8 @@ private struct QueueRow: View {
                 .opacity(hovering ? 1 : 0.45)
 
             Button {
-                model.player.play(song, queue: model.player.queue)
+                // 直接选择队列条目，保留它最初的播放来源。
+                model.player.playQueued(at: index)
             } label: {
                 HStack(spacing: 10) {
                     ZStack {

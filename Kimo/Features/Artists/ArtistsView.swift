@@ -186,7 +186,7 @@ struct ArtistDetailView: View {
 
                     LazyVStack(spacing: 2) {
                         ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                            SongRowView(song: song, index: index + 1, queue: songs)
+                            SongRowView(song: song, index: index + 1, queue: songs, source: .artist(id: id, title: title))
                         }
                     }
                 }
@@ -239,7 +239,7 @@ struct ArtistDetailView: View {
 
                 HStack(spacing: 10) {
                     Button {
-                        if let first = songs.first { model.player.play(first, queue: songs) }
+                        if let first = songs.first { model.player.play(first, queue: songs, source: .artist(id: id, title: title)) }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "play.fill").font(.system(size: 12))

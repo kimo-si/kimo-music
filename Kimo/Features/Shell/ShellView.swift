@@ -14,20 +14,37 @@ struct RootView: View {
     @Environment(\.theme) private var theme
     @Environment(\.colorScheme) private var colorScheme
 
+    private var usesCompactConstraints: Bool { model.isMini || WindowBridge.shared.isTransitioning }
+
     var body: some View {
-        Group {
-            if model.isMini {
-                MiniPlayerView()
-            } else {
-                fullShell
-            }
+        GeometryReader { geometry in
+            let bridge = WindowBridge.shared
+            let size = bridge.isTransitioning ? bridge.transitionContentSize : geometry.size
+            modeContent
+                .frame(width: size.width, height: size.height)
+                .clipped()
         }
+        // 过渡期间暂缓大窗最小尺寸，避免系统先撑开窗口再播放动画。
+        .frame(minWidth: usesCompactConstraints ? Metrics.miniPlayerWidth : 1100,
+               minHeight: usesCompactConstraints ? 0 : 680)
+        .ignoresSafeArea()
+        .onAppear { model.systemIsDark = colorScheme == .dark }
+        .onChange(of: colorScheme) { _, value in model.systemIsDark = value == .dark }
         .task(id: auth.isLoggedIn) {
             if auth.isLoggedIn {
                 await model.likes.refresh()
             } else {
                 model.likes.reset()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var modeContent: some View {
+        if model.isMini {
+            MiniPlayerView()
+        } else {
+            fullShell
         }
     }
 
@@ -67,8 +84,6 @@ struct RootView: View {
         // 窗口透明时不能铺底色，否则桌面永远透不过来。
         .background(model.settings.windowEffect == .none ? theme.shell : Color.clear)
         .ignoresSafeArea()
-        .onAppear { model.systemIsDark = colorScheme == .dark }
-        .onChange(of: colorScheme) { _, value in model.systemIsDark = value == .dark }
         .overlay {
             GeometryReader { geo in
                 let seam = 1 - Metrics.playerHeight / max(geo.size.height, 1)

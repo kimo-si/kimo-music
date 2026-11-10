@@ -33,15 +33,13 @@ struct KimoApp: App {
                 .environment(auth)
                 .environment(\.theme, model.theme)
                 .preferredColorScheme(colorScheme)
-                // 小窗的整体高度由 WindowBridge 约束，避免内容最小高度再叠加标题栏。
-                .frame(minWidth: model.isMini ? Metrics.miniPlayerWidth : 1100,
-                       minHeight: model.isMini ? 0 : 680)
                 .background(WindowConfigurator(effect: model.settings.windowEffect,
                                                 shell: model.theme.shellRGB))
                 .onAppear {
                     CoreService.shared.boot()
                     auth.restore()
-                    appDelegate.model = model
+                    // 将系统媒体控制绑定到播放器，窗口关闭后仍可由耳机操作。
+                    appDelegate.bind(model)
                     DesktopLyricsController.shared.bind(model)
                     DesktopLyricsController.shared.restoreIfNeeded()
                 }
@@ -59,9 +57,17 @@ struct KimoApp: App {
     }
 }
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    weak var model: AppModel?
+    private weak var model: AppModel?
+    private let mediaControls = SystemMediaControls()
     private var keyMonitor: Any?
+
+    // 统一绑定应用级播放控制，重复显示窗口不会重复注册系统指令。
+    func bind(_ model: AppModel) {
+        self.model = model
+        mediaControls.start(player: model.player)
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -89,6 +95,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        // 退出前释放系统媒体监听，避免留下过期的正在播放状态。
+        mediaControls.stop()
         CoreService.shared.shutdown()
     }
 
@@ -129,7 +137,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+    // 关闭最后一个窗口后继续在程序坞后台运行，仅在明确退出时关闭播放与核心服务。
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
 }
 
 /// 让 SwiftUI 窗口变成「内容铺满 + 透明标题栏」，并按设置切换窗口是否透出桌面。
@@ -137,12 +148,12 @@ struct WindowConfigurator: NSViewRepresentable {
     let effect: WindowEffect
     let shell: (Int, Int, Int)
 
+    // 创建窗口配置视图，让新窗口先接收快捷键而不是自动进入搜索输入。
     func makeNSView(context: Context) -> NSView {
-        let view = NSView()
+        let view = WindowInitialFocusView()
         DispatchQueue.main.async {
             guard let window = view.window else { return }
             WindowBridge.shared.window = window
-            WindowBridge.shared.applyPending()
             window.titlebarAppearsTransparent = true
             window.titleVisibility = .hidden
             window.styleMask.insert(.fullSizeContentView)
@@ -159,6 +170,8 @@ struct WindowConfigurator: NSViewRepresentable {
                 b.frame.origin.x = 14 + CGFloat(i) * 18
                 b.frame.origin.y = superview.bounds.height - 24
             }
+            // 完成窗口基础配置后再应用启动模式，避免覆盖小窗的拖动与按钮状态。
+            WindowBridge.shared.applyPending()
         }
         return view
     }
@@ -182,4 +195,24 @@ struct WindowConfigurator: NSViewRepresentable {
         window.hasShadow = true
         window.contentView?.wantsLayer = true
     }
+}
+
+// 为窗口提供初始焦点，不增加 Tab 停靠点，也不影响鼠标操作。
+private final class WindowInitialFocusView: NSView {
+    private weak var configuredWindow: NSWindow?
+    override var acceptsFirstResponder: Bool { true }
+    override var canBecomeKeyView: Bool { false }
+
+    // 视图挂入新窗口时设置初始焦点，避免系统自动激活首个输入框。
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard let window, window !== configuredWindow else { return }
+        configuredWindow = window
+        window.initialFirstResponder = self
+        // 将初始键盘事件交给窗口，搜索框仍可由用户主动点击聚焦。
+        window.makeFirstResponder(self)
+    }
+
+    // 背景配置层不截获鼠标点击，保留原有窗口拖动和控件交互。
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
