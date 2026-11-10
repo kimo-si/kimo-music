@@ -1,6 +1,6 @@
 # Kimo
 
-macOS 原生音乐播放器：**界面照搬 [cocomusic](https://github.com/markcxx/cocomusic)，核心复用 [MoeKoeMusic](https://github.com/MoeKoeMusic/MoeKoeMusic)**。
+macOS 原生音乐播放器：**核心复用 [MoeKoeMusic](https://github.com/MoeKoeMusic/MoeKoeMusic)**。
 
 - UI：SwiftUI + AppKit 无边框玻璃窗口，逐像素对照 `cocomusic/src/**/*.module.css` 还原
 - 核心：MoeKoeMusic 的 `kugoumusicapi`（236 个酷狗接口模块）+ express 路由 + 设备指纹，作为子进程托管
@@ -26,18 +26,22 @@ macOS 原生音乐播放器：**界面照搬 [cocomusic](https://github.com/mark
 
 ![Kimo macOS 首页，展示推荐歌单和底部播放控制](docs-home.png)
 
+**播放页 · 唱片与同步歌词**
+
+![Kimo 播放页，展示唱片、同步歌词和播放控制](docs-lyrics.png)
+
 <table>
   <tr>
-    <th>外观和窗口设置</th>
+    <th>主题外观</th>
     <th>迷你播放器</th>
   </tr>
   <tr>
-    <td><img src="docs-settings.png" alt="外观、主题与窗口材质设置" width="800" /></td>
+    <td><img src="docs-settings.png" alt="主题外观选择和预览" width="800" /></td>
     <td><img src="docs-mini.png" alt="迷你播放器中的播放控制和来源列表" width="300" /></td>
   </tr>
 </table>
 
-截图来自当前 macOS 构建；播放列表使用预览数据，首页推荐会随平台返回内容变化。
+截图展示 macOS 客户端的复古 Hi-Fi 主题，首页推荐会随平台返回内容变化。
 
 ## 运行
 
