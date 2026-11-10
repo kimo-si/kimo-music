@@ -24,7 +24,13 @@ final class CoreService {
     /// 核心用 cookieToJson 解析后合并进 cookie，与网页端行为一致。
     private var authCookie: String?
 
-    func setAuthCookie(_ cookie: String?) {
+    private(set) var sessionID = UUID()
+    private var onSessionExpired: (() -> Void)?
+
+    /// 切换会话时同时更换标识，旧请求的失效响应只能作用于原会话。
+    func setAuthCookie(_ cookie: String?, onExpired: (() -> Void)? = nil) {
+        sessionID = UUID()
+        onSessionExpired = onExpired
         authCookie = cookie
     }
 
@@ -181,15 +187,25 @@ final class CoreService {
 
     /// 返回完整 JSON（含 error_code / status），登录类接口需要看这些字段。
     func getRaw(_ path: String, _ query: [String: String] = [:]) async throws -> JSON {
+        let requestSession = sessionID
+        let response: JSON
         do {
-            return try await performGet(path, query)
+            response = try await performGet(path, query)
         } catch let error as URLError where error.code == .cannotConnectToHost
                                             || error.code == .networkConnectionLost
                                             || error.code == .cannotFindHost {
+            guard requestSession == sessionID else { throw CancellationError() }
             isReady = false
             await restart()
-            return try await performGet(path, query)
+            guard requestSession == sessionID else { throw CancellationError() }
+            response = try await performGet(path, query)
         }
+        if requestSession == sessionID,
+           let code = J.int(response, "errcode", "error_code"), code == 20017 || code == 20018 {
+            // 只通知发出请求的会话，保留完整响应供播放和收藏等调用方处理。
+            onSessionExpired?()
+        }
+        return response
     }
 
     private func performGet(_ path: String, _ query: [String: String]) async throws -> JSON {
@@ -198,6 +214,8 @@ final class CoreService {
             comps.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
         }
         var req = URLRequest(url: comps.url!)
+        // 会话由 Authorization 统一管理，避免系统 Cookie 在退出后继续携带旧凭据。
+        req.httpShouldHandleCookies = false
         req.timeoutInterval = 20
         // 登录轮询必须每次都真的发出去；URLSession 的默认缓存会让状态停在「等待扫码」。
         req.cachePolicy = .reloadIgnoringLocalCacheData

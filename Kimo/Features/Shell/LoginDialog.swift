@@ -53,7 +53,18 @@ struct LoginDialog: View {
                 }
             }
 
-            if auth.wrappedValue.isLoggedIn {
+            if let error = auth.wrappedValue.sessionError {
+                Text(error)
+                    .font(.system(size: 11))
+                    .foregroundStyle(theme.like)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 8)
+            }
+
+            if auth.wrappedValue.phase == .verifying {
+                ProgressView("正在校验登录状态…")
+                    .controlSize(.small)
+            } else if auth.wrappedValue.isLoggedIn {
                 loggedIn
             } else {
                 loginFlow(auth: auth)
@@ -70,13 +81,6 @@ struct LoginDialog: View {
             Text(auth.nickname)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(theme.textStrong)
-            if let error = auth.sessionError {
-                Text(error)
-                    .font(.system(size: 11))
-                    .foregroundStyle(theme.like)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 8)
-            }
             if auth.profile?.vip == true {
                 Text("VIP")
                     .font(.system(size: 10, weight: .semibold))
@@ -112,14 +116,12 @@ struct LoginDialog: View {
 
             switch auth.wrappedValue.loginTab {
             case .qr:
-                qrSection
+                qrSection.onAppear {
+                    // 仅当扫码页可见时才为新登录流程取码。
+                    if auth.wrappedValue.phase == .idle { auth.wrappedValue.startLogin() }
+                }
             case .phone:
                 phoneSection(auth: auth)
-            }
-        }
-        .onAppear {
-            if auth.wrappedValue.phase == .idle, auth.wrappedValue.qrMatrix == nil {
-                auth.wrappedValue.startLogin()
             }
         }
     }

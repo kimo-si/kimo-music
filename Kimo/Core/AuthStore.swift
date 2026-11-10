@@ -35,6 +35,7 @@ final class AuthStore {
         case loadingQR
         case waiting          // 已出码，等扫码
         case scanned          // 已扫，等确认
+        case verifying
         case authorized
         case expired
         case failed(String)
@@ -98,14 +99,18 @@ final class AuthStore {
     private var pollTask: Task<Void, Never>?
     private var countdownTask: Task<Void, Never>?
 
-    private static var storeURL: URL {
+    private let storeURL: URL
+
+    private static var defaultStoreURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let dir = base.appendingPathComponent("Kimo/Core", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("auth.json")
     }
 
-    init() {
+    /// 指定会话缓存位置，默认沿用原有账号文件。
+    init(storeURL: URL? = nil) {
+        self.storeURL = storeURL ?? Self.defaultStoreURL
         // 开发期截图用：debug.json 里写 logintab / phone 可以直接落到手机号登录页。
         var env = ProcessInfo.processInfo.environment
         if let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
@@ -126,59 +131,62 @@ final class AuthStore {
 
     // MARK: - 启动时恢复
 
+    /// 恢复旧版 cookie 或当前字段格式，校验结束后再展示缓存的资料。
     func restore() {
-        guard let data = try? Data(contentsOf: Self.storeURL),
+        guard phase == .idle, let data = try? Data(contentsOf: storeURL),
               let saved = try? JSONDecoder().decode(Saved.self, from: data) else { return }
-        if let fields = saved.fields, !fields.isEmpty {
-            authFields = fields
-            CoreService.shared.setAuthCookie(Self.cookieString(from: fields))
-        } else if let cookie = saved.cookie {
-            CoreService.shared.setAuthCookie(Self.sanitizedCookie(cookie))
-        }
-        profile = Self.filled(saved.profile, fields: saved.fields ?? [:])
-        phase = .authorized
-        Task { await verifySession() }
+        var fields = saved.fields ?? [:]
+        if fields.isEmpty { fields = Self.cookieFields(saved.cookie ?? "") }
+        guard let session = beginSession(fields) else { return }
+        let candidate = Self.filled(saved.profile, fields: fields)
+        Task { await verifySession(candidate, session: session) }
     }
 
-    /// 调一个必须登录的接口，确认 token 真的被接受。
-    /// 没有 token 时酷狗返回 20010（参数错误），不是「登录过期」。
-    func verifySession() async {
-        guard authFields["token"] != nil, authFields["userid"] != nil else {
-            sessionError = "登录信息不完整，请重新登录"
-            return
+    /// 安装可安全发送的凭据，并将当前会话的失效通知绑定到统一清理入口。
+    private func beginSession(_ fields: [String: String]) -> UUID? {
+        guard let token = fields["token"], Self.isHeaderSafe(token),
+              let userid = fields["userid"], Self.isHeaderSafe(userid) else {
+            invalidateSession("登录信息不完整，请重新登录")
+            return nil
         }
-        let dict: JSON
+        qrGeneration &+= 1
+        authFields = fields
+        sessionError = nil
+        phase = .verifying
+        // 在收藏、播放或校验接口明确报告过期时一起清除账号资料和凭据。
+        CoreService.shared.setAuthCookie(Self.cookieString(from: fields)) { [weak self] in
+            self?.invalidateSession("登录已失效，请重新登录")
+        }
+        return CoreService.shared.sessionID
+    }
+
+    /// 校验账号后发布资料。网络或服务异常时保留凭据，允许稍后重试。
+    private func verifySession(_ candidate: UserProfile, session: UUID) async {
+        guard session == CoreService.shared.sessionID else { return }
+        let warning: String?
         do {
-            dict = try await CoreService.shared.getRaw("/user/playlist", [
-                "page": "1", "pagesize": "1",
-            ])
+            let response = try await CoreService.shared.getRaw("/user/playlist", ["page": "1", "pagesize": "1"])
+            let code = J.int(response, "error_code") ?? 0
+            let valid = code == 0 && J.int(response, "status") == 1
+            warning = valid ? nil : "暂时无法校验登录状态（\(code)）"
         } catch {
-            sessionError = "无法连接核心服务"
-            return
+            warning = "无法连接核心服务，暂时无法校验登录状态"
         }
-        let code = J.int(dict, "error_code") ?? 0
-        let status = J.int(dict, "status") ?? 0
-        if code == 0, status == 1 {
-            sessionError = nil
-            await refreshProfile()
-            return
-        }
-        switch code {
-        case 20017, 20018:
-            sessionError = "酷狗判定登录已失效（\(code)），请重新登录"
-        case 20010:
-            sessionError = "登录态没有送到接口（20010），请重新登录"
-        default:
-            sessionError = code == 0 ? "登录校验失败" : "登录校验返回错误码 \(code)"
-        }
+        // 失效、退出或换号后，不允许迟到的响应重新显示或保存旧头像。
+        guard session == CoreService.shared.sessionID else { return }
+        sessionError = warning
+        profile = candidate
+        phase = .authorized
+        save(profile: candidate)
+        if warning == nil { await refreshProfile(session: session) }
     }
 
-    /// 登录返回里已经有昵称。详情接口用来刷新会员标记，失败时保留已有资料。
-    private func refreshProfile() async {
+    /// 刷新同一会话的昵称、头像和会员标记。
+    private func refreshProfile(session: UUID) async {
         guard var current = profile else { return }
         let userid = authFields["userid"] ?? current.userid
         guard let payload = try? await CoreService.shared.get("/user/detail", ["userid": userid]),
-              let dict = payload as? JSON else { return }
+              session == CoreService.shared.sessionID, let dict = payload as? JSON else { return }
         if let name = J.str(dict, "nickname", "username", "nick_name") {
             current.nickname = name
         }
@@ -295,9 +303,7 @@ final class AuthStore {
                     }
                     // 不能只留 token/userid：酷狗校验还会看 t1 等字段，
                     // 少一个就会被判成 token 失效（20017）。
-                    authFields = Self.scalarFields(from: dict)
-                    CoreService.shared.setAuthCookie(Self.cookieString(from: authFields))
-                    await finishLogin(userid: userid, login: dict)
+                    await finishLogin(userid: userid, login: dict, fields: Self.scalarFields(from: dict))
                     return
                 case 0:
                     // 过期就换一张新的，不把用户卡死在「已失效」上。
@@ -350,6 +356,8 @@ final class AuthStore {
             phoneError = "请输入收到的验证码"
             return
         }
+        guard !submitting else { return }
+        let session = CoreService.shared.sessionID
         submitting = true
         phoneError = nil
         defer { submitting = false }
@@ -358,6 +366,7 @@ final class AuthStore {
             let dict = try await CoreService.shared.getRaw("/login/cellphone", [
                 "mobile": phone, "code": code,
             ])
+            guard session == CoreService.shared.sessionID else { return }
             let data = dict["data"] as? JSON ?? [:]
             let token = J.str(data, "token") ?? J.str(dict, "token")
             let userid = J.str(data, "userid") ?? J.str(dict, "userid")
@@ -368,11 +377,10 @@ final class AuthStore {
                 return
             }
 
-            authFields = Self.scalarFields(from: data)
-            authFields["token"] = token
-            authFields["userid"] = userid
-            CoreService.shared.setAuthCookie(Self.cookieString(from: authFields))
-            await finishLogin(userid: userid, login: data)
+            var fields = Self.scalarFields(from: data)
+            fields["token"] = token
+            fields["userid"] = userid
+            await finishLogin(userid: userid, login: data, fields: fields)
         } catch {
             phoneError = error.localizedDescription
         }
@@ -395,20 +403,28 @@ final class AuthStore {
 
     // MARK: - 完成登录
 
-    private func finishLogin(userid: String, login: JSON) async {
+    /// 将两种登录入口交给同一套会话校验。
+    private func finishLogin(userid: String, login: JSON, fields: [String: String]) async {
+        guard let session = beginSession(fields) else { return }
         let profile = UserProfile(
             userid: userid,
             nickname: J.str(login, "nickname", "username", "nick_name") ?? "酷狗用户",
             avatar: J.str(login, "pic", "avatar", "user_pic"),
             vip: (J.int(login, "vip_type", "vipType") ?? 0) > 0
         )
-        self.profile = profile
-        self.phase = .authorized
-        save(profile: profile)
-        await verifySession()
+        // 校验后再发布和持久化新账号。
+        await verifySession(profile, session: session)
     }
 
+    /// 清理被拒绝的会话，并在登录入口解释原因。
+    private func invalidateSession(_ reason: String) {
+        logout()
+        sessionError = reason
+    }
+
+    /// 撤销凭据并清理账号资料、缓存及登录中的临时状态。
     func logout() {
+        qrGeneration &+= 1
         pollTask?.cancel()
         countdownTask?.cancel()
         CoreService.shared.setAuthCookie(nil)
@@ -417,10 +433,12 @@ final class AuthStore {
         qrMatrix = nil
         authFields = [:]
         sessionError = nil
+        phoneState = .idle
+        scannedNickname = nil
         phoneError = nil
         code = ""
         phase = .idle
-        try? FileManager.default.removeItem(at: Self.storeURL)
+        try? FileManager.default.removeItem(at: storeURL)
     }
 
     /// 只保留字符串/数字字段，忽略嵌套对象（如 user_detail）。
@@ -451,14 +469,15 @@ final class AuthStore {
         }.joined(separator: ";")
     }
 
-    static func sanitizedCookie(_ raw: String) -> String {
+    /// 读取旧版会话中的凭据供校验及下次保存。
+    private static func cookieFields(_ raw: String) -> [String: String] {
         var fields: [String: String] = [:]
         for part in raw.split(separator: ";") {
             let pair = part.split(separator: "=", maxSplits: 1).map(String.init)
             guard pair.count == 2 else { continue }
             fields[pair[0].trimmingCharacters(in: .whitespaces)] = pair[1]
         }
-        return cookieString(from: fields)
+        return fields
     }
 
     private static func isHeaderSafe(_ value: String) -> Bool {
@@ -493,7 +512,7 @@ final class AuthStore {
     private func save(profile: UserProfile) {
         let payload = Saved(cookie: Self.cookieString(from: authFields), fields: authFields, profile: profile)
         if let data = try? JSONEncoder().encode(payload) {
-            try? data.write(to: Self.storeURL)
+            try? data.write(to: storeURL, options: .atomic)
         }
     }
 
